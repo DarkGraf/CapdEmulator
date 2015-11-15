@@ -1,0 +1,14 @@
+CapdEmulator.v12.suo
+CapdEmulator/bin
+CapdEmulator/obj
+!Capdxx/bin
+Capdxx/bin/*
+!Capdxx/bin/Debug
+Capdxx/bin/Debug/*
+!Capdxx/bin/Debug/1_ildasm.cmd
+!Capdxx/bin/Debug/2_ilasm.cmd
+!Capdxx/bin/Debug/Capdxx.il
+Capdxx/obj
+CapdxxClient/bin
+CapdxxClient/obj
+CapdxxClient/CapdxxClient.csproj.user
