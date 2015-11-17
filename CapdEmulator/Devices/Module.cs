@@ -35,7 +35,7 @@ namespace CapdEmulator.Devices
 
     public IList<IModuleParameter> Parameters { get; protected set; }
 
-    public void Execute(Command command)
+    public void Execute(Command command, byte[] parameters)
     {
       
     }

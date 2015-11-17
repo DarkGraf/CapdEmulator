@@ -10,11 +10,11 @@ namespace CapdxxClient
   public static class Export
   {
 #warning Если произошло исключение, то канал будет не рабочим в дальнейшем (например произвести поиск при выключенном сервисе).
-    static ICapdEmulator proxy = CapdEmulatorClient.CreateCapdEmulatorClient();
+    static ICapdEmulator proxyDevice = CapdEmulatorClient.CreateCapdEmulatorClient();
 
     public static bool SearchDevices(IntPtr deviceInfo, ref int size)
     {
-      DeviceInfo[] devices = proxy.SearchDevices();
+      DeviceInfo[] devices = proxyDevice.SearchDevices();
       size = devices.Length * Marshal.SizeOf(typeof(DeviceInfoDelphi));
       if (deviceInfo != IntPtr.Zero)
       {
@@ -37,7 +37,7 @@ namespace CapdxxClient
 
     public static bool SearchModules(uint handle, IntPtr modulesInfo, ref int size)
     {
-      ModuleInfo[] modules = proxy.SearchModules(handle);
+      ModuleInfo[] modules = proxyDevice.SearchModules(handle);
       size = modules.Length * Marshal.SizeOf(typeof(ModuleInfoDelphi));
       if (modulesInfo != IntPtr.Zero)
       {
@@ -65,26 +65,27 @@ namespace CapdxxClient
 
     public static bool OpenDevice(uint handle)
     {
+      proxyDevice.OpenDevice(handle);
       return true;
     }
 
     public static bool CloseDevice(uint handle)
     {
+      proxyDevice.CloseDevice(handle);
       return true;
     }
 
     public static bool SendCommandSync(uint handle, byte address, byte command, IntPtr param)
     {
+#warning Добаввить параметр.
+      proxyDevice.SendCommandSync(handle, address, command, new byte[0]);
       return true;
     }
 
     public static bool SendCommandAsync(uint handle, byte address, byte command, IntPtr param)
     {
-      /*var module = device.Modules.FirstOrDefault(m => m.Id == address);
-      if (module != null)
-      {
-        module.Execute((Command)command);
-      }*/
+#warning Добаввить параметр.
+      proxyDevice.SendCommandSync(handle, address, command, new byte[0]);
       return true;
     }
 
@@ -135,7 +136,7 @@ namespace CapdxxClient
 
     public static bool GetModuleParams(uint handle, byte address, IntPtr buffer, ref int size)
     {
-      ModuleParamInfo[] parameters = proxy.GetModuleParams(handle, address);
+      ModuleParamInfo[] parameters = proxyDevice.GetModuleParams(handle, address);
       size = parameters.Length;
       if (buffer != IntPtr.Zero)
       {

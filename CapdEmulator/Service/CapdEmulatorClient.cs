@@ -26,6 +26,21 @@ namespace CapdEmulator.Service
       return Channel.SearchModules(handle);
     }
 
+    public void OpenDevice(uint handle)
+    {
+      Channel.OpenDevice(handle);
+    }
+
+    public void CloseDevice(uint handle)
+    {
+      Channel.CloseDevice(handle);
+    }
+
+    public void SendCommandSync(uint handle, byte address, byte command, byte[] parameters)
+    {
+      Channel.SendCommandSync(handle, address, command, parameters);
+    }
+
     public ModuleParamInfo[] GetModuleParams(uint handle, byte address)
     {
       return Channel.GetModuleParams(handle, address);

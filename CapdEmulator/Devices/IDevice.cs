@@ -9,6 +9,10 @@ namespace CapdEmulator.Devices
     byte Version { get; }
     string Description { get; }
     IList<IModule> Modules { get; }
+
+    void Open();
+    void Close();
+    void SendCommandSync(byte address, Command command, byte[] parameters);
   }
 
   interface IModule
@@ -23,7 +27,7 @@ namespace CapdEmulator.Devices
     string Description { get; }
     IList<IModuleParameter> Parameters { get; }
 
-    void Execute(Command command);
+    void Execute(Command command, byte[] parameters);
   }
 
   interface IModuleParameter

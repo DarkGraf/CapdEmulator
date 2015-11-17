@@ -70,6 +70,31 @@ namespace CapdEmulator.Service
       return infos.ToArray();
     }
 
+    public void OpenDevice(uint handle)
+    {
+      CommandReceived();
+      device.Open();
+    }
+
+    public void CloseDevice(uint handle)
+    {
+      CommandReceived();
+      device.Close();
+    }
+
+    public void SendCommandSync(uint handle, byte address, byte command, byte[] parameters)
+    {
+      if (Enum.IsDefined(typeof(Command), (int)command))
+      {
+        CommandReceived(string.Format("SendCommandSync {0}", (Command)command));
+        device.SendCommandSync(address, (Command)command, parameters);
+      }
+      else
+      {
+        CommandReceived(string.Format("Неизвестная команда {0}", command));
+      }
+    }
+
     public ModuleParamInfo[] GetModuleParams(uint handle, byte address)
     {
       CommandReceived();

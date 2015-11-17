@@ -55,7 +55,13 @@ namespace CapdEmulator.Service
     [OperationContract]
     ModuleInfo[] SearchModules(uint handle);
     [OperationContract]
+    void OpenDevice(uint handle);
+    [OperationContract]
+    void CloseDevice(uint handle);
+    [OperationContract]
     ModuleParamInfo[] GetModuleParams(uint handle, byte address);
+    [OperationContract]
+    void SendCommandSync(uint handle, byte address, byte command, byte[] parameters);
   }
 
   [ServiceContract(CallbackContract = typeof(ICapdControlEmulatorEvents))]
