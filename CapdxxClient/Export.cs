@@ -85,6 +85,7 @@ namespace CapdxxClient
     public static bool SendCommandAsync(uint handle, byte address, byte command, IntPtr param)
     {
 #warning Добаввить параметр.
+      DelphiDynArray<byte> bytes = new DelphiDynArray<byte>(param);
       proxyDevice.SendCommandSync(handle, address, command, new byte[0]);
       return true;
     }
