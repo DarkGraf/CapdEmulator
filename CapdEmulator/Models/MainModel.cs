@@ -26,7 +26,7 @@ namespace CapdEmulator.Models
           serviceHost = CapdEmulatorService.CreateCapdEmulatorService();
           serviceHost.Open();
           controlEmulator = CapdControlEmulatorClient.CreateCapdControlEmulatorClient();
-          controlEmulator.CommandReceived += (s, e) => { Messages.Add(e.Description); };
+          controlEmulator.CommandReceived += (s, e) => { Messages.Insert(0, e.Description); };
           controlEmulator.Connect();
           Messages.Add("Активно");
         }

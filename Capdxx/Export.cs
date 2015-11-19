@@ -30,15 +30,15 @@ namespace Capdxx
     }
 
     [return: MarshalAs(UnmanagedType.I1)]
-    public static bool SendCommandSync(uint handle, byte address, byte command, IntPtr param)
+    public static bool SendCommandSync(uint handle, byte address, byte command, IntPtr param, int maxIndex)
     {
-      return CapdxxClient.Export.SendCommandSync(handle, address, command, param);
+      return CapdxxClient.Export.SendCommandSync(handle, address, command, param, maxIndex);
     }
 
     [return: MarshalAs(UnmanagedType.I1)]
-    public static bool SendCommandAsync(uint handle, byte address, byte command, IntPtr ptr)
+    public static bool SendCommandAsync(uint handle, byte address, byte command, IntPtr param, int maxIndex)
     {
-      return CapdxxClient.Export.SendCommandAsync(handle, address, command, ptr);
+      return CapdxxClient.Export.SendCommandAsync(handle, address, command, param, maxIndex);
     }
 
     [return: MarshalAs(UnmanagedType.I1)]
@@ -89,9 +89,9 @@ namespace Capdxx
     }
 
     [return: MarshalAs(UnmanagedType.I1)]
-    public static bool GetQuant(uint handle, IntPtr quant)
+    public static bool GetQuant(uint handle, ref IntPtr quant)
     {
-      return CapdxxClient.Export.GetQuant(handle, quant);
+      return CapdxxClient.Export.GetQuant(handle, ref quant);
     }
 
     [return: MarshalAs(UnmanagedType.I1)]

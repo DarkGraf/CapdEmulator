@@ -3,8 +3,19 @@ using System.Collections.Generic;
 
 namespace CapdEmulator.Devices
 {
+  interface IModuleThread
+  {
+    void Start();
+    void Stop();
+  }
+
   abstract class ModuleBase : IModule
   {
+    bool active;
+    IModuleThread thread;
+
+    protected int Frequency { get; private set; }
+
     public ModuleBase(ModuleType moduleType)
     {
       Id = (byte)moduleType;
@@ -13,7 +24,11 @@ namespace CapdEmulator.Devices
       GainFactor = 0;
       SplineLevel = 0;
       Parameters = new List<IModuleParameter>();
+
+      active = false;
     }
+
+    protected abstract IModuleThread CreateThread();
 
     #region IModule
 
@@ -38,6 +53,30 @@ namespace CapdEmulator.Devices
     public void Execute(Command command, byte[] parameters)
     {
       
+    }
+
+    public void SetADCFreq(int frequency)
+    {
+      Frequency = frequency;
+    }
+
+    public void Start()
+    {
+      if (!active)
+      {
+        thread = CreateThread();
+        thread.Start();
+        active = true;
+      }
+    }
+
+    public void Stop()
+    {
+      if (active)
+      {
+        thread.Stop();
+        active = false;
+      }
     }
 
     #endregion
@@ -68,6 +107,11 @@ namespace CapdEmulator.Devices
 
     public override string Description { get; protected set; }
 
+    protected override IModuleThread CreateThread()
+    {
+      return new PressModuleThread();
+    }
+
     #endregion
   }
 
@@ -95,6 +139,42 @@ namespace CapdEmulator.Devices
     public override uint Serial { get; protected set; }
 
     public override string Description { get; protected set; }
+
+    protected override IModuleThread CreateThread()
+    {
+      return new PulseModuleThread();
+    }
+
+    #endregion
+  }
+
+  class NullModule : ModuleBase
+  {
+    class NullModuleThread : IModuleThread
+    {
+      public void Start() { }
+      public void Stop() { }
+    }
+
+    public NullModule() : base(ModuleType.Null) 
+    {
+      Version = 1;
+      Serial = 1;
+      Description = "Нулевой модуль";
+    }
+
+    #region ModuleBase
+
+    public override uint Version { get; protected set; }
+
+    public override uint Serial  { get; protected set; }
+
+    public override string Description { get; protected set; }
+
+    protected override IModuleThread CreateThread()
+    {
+      return new NullModuleThread();
+    }
 
     #endregion
   }

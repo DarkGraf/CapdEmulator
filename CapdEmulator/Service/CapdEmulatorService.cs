@@ -13,6 +13,8 @@ namespace CapdEmulator.Service
   {
     private IDevice device;
     private IList<ICapdControlEmulatorEvents> callbacks;
+    // Для оптимизации работы метода GetQuant создадим квант один раз.
+    private Quantum currentQuantum;
 
     public static ServiceHost CreateCapdEmulatorService()
     {
@@ -26,6 +28,7 @@ namespace CapdEmulator.Service
     {
       device = new Device();
       callbacks = new List<ICapdControlEmulatorEvents>();
+      currentQuantum = new Quantum();
     }
 
     private void CommandReceived([CallerMemberName]string description = "")
@@ -82,6 +85,19 @@ namespace CapdEmulator.Service
       device.Close();
     }
 
+    public ModuleParamInfo[] GetModuleParams(uint handle, byte address)
+    {
+      CommandReceived();
+      var infos = from parameter in device.Modules.Where(m => m.Id == address).SelectMany(m => m.Parameters)
+                  select new ModuleParamInfo
+                  {
+                    Id = parameter.Id,
+                    Value = parameter.Value,
+                    Description = parameter.Description
+                  };
+      return infos.ToArray();
+    }
+
     public void SendCommandSync(uint handle, byte address, byte command, byte[] parameters)
     {
       if (Enum.IsDefined(typeof(Command), (int)command))
@@ -95,17 +111,39 @@ namespace CapdEmulator.Service
       }
     }
 
-    public ModuleParamInfo[] GetModuleParams(uint handle, byte address)
+    public void SetADCFreq(uint handle, byte address, int frequency)
+    {
+      CommandReceived(string.Format("SetADCFreq {0}", frequency));
+      device.SetADCFreq(handle, address, frequency);
+    }
+
+    public void StartModule(uint handle, byte address)
     {
       CommandReceived();
-      var infos = from parameter in device.Modules.Where(m => m.Id == address).SelectMany(m => m.Parameters)
-                  select new ModuleParamInfo
-                  {
-                    Id = parameter.Id,
-                    Value = parameter.Value,
-                    Description = parameter.Description
-                  };
-      return infos.ToArray();
+      device.StartModule(address);
+    }
+
+    public void StopModule(uint handle, byte address)
+    {
+      CommandReceived();
+      device.StopModule(address);
+    }
+
+    public Quantum GetQuant(uint handle)
+    {
+      CommandReceived();
+      IQuantumDevice quant;
+      // Если метод вернет истину, значит квант получили.
+      currentQuantum.IsActual = device.GetQuant(out quant);
+      if (currentQuantum.IsActual)
+      {
+        currentQuantum.ModuleId = (byte)quant.ModuleId;
+        currentQuantum.ChannelId = quant.ChannelId;
+        currentQuantum.DataType = (byte)quant.DataType;
+        currentQuantum.Data = quant.Data;
+      }    
+
+      return currentQuantum;
     }
 
     #endregion

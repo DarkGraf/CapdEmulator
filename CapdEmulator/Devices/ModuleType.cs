@@ -4,6 +4,7 @@ namespace CapdEmulator.Devices
 {
   enum ModuleType : byte
   {
+    Null = 0,
     /// <summary>
     /// Комбиплата (2).
     /// </summary>

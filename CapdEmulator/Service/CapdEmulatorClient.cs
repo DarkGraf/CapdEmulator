@@ -36,14 +36,34 @@ namespace CapdEmulator.Service
       Channel.CloseDevice(handle);
     }
 
+    public ModuleParamInfo[] GetModuleParams(uint handle, byte address)
+    {
+      return Channel.GetModuleParams(handle, address);
+    }
+
     public void SendCommandSync(uint handle, byte address, byte command, byte[] parameters)
     {
       Channel.SendCommandSync(handle, address, command, parameters);
     }
 
-    public ModuleParamInfo[] GetModuleParams(uint handle, byte address)
+    public void SetADCFreq(uint handle, byte address, int frequency)
     {
-      return Channel.GetModuleParams(handle, address);
+      Channel.SetADCFreq(handle, address, frequency);
+    }
+
+    public void StartModule(uint handle, byte address)
+    {
+      Channel.StartModule(handle, address);
+    }
+
+    public void StopModule(uint handle, byte address)
+    {
+      Channel.StopModule(handle, address);
+    }
+
+    public Quantum GetQuant(uint handle)
+    {
+      return Channel.GetQuant(handle); 
     }
 
     #endregion

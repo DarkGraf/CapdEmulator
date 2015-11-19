@@ -84,4 +84,33 @@ namespace CapdxxClient.Types
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 255)]
     public byte[] Description;
   }
+
+  [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+  struct QuantumDelphi
+  {
+    #region Тип Delphi
+    // TQuant = packed record
+    //   ModuleID:   Byte; 1 байт
+    //   ChannelID:  Byte; 1 байт
+    //   DataType:   Byte; 1 байт
+    //   Data:       array[0..255] of Byte; 256 байт
+    // end;
+    // Итого: 259
+    #endregion
+
+    public byte ModuleId;
+    public byte ChannelId;
+    public byte DataType;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+    public byte[] Data;
+
+    public QuantumDelphi(byte moduleId, byte channelId, byte dataType, byte[] data)
+    {
+      ModuleId = moduleId;
+      ChannelId = channelId;
+      DataType = dataType;
+      Data = new byte[256];
+      Array.Copy(data, Data, Math.Min(data.Length, 256));
+    }
+  }
 }

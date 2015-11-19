@@ -47,6 +47,21 @@ namespace CapdEmulator.Service
     public string Description;
   }
 
+  [DataContract]
+  public class Quantum
+  {
+    [DataMember]
+    public byte ModuleId;
+    [DataMember]
+    public byte ChannelId;
+    [DataMember]
+    public byte DataType;
+    [DataMember]
+    public byte[] Data;
+    [DataMember]
+    public bool IsActual;
+  }
+
   [ServiceContract]
   public interface ICapdEmulator
   {
@@ -62,6 +77,14 @@ namespace CapdEmulator.Service
     ModuleParamInfo[] GetModuleParams(uint handle, byte address);
     [OperationContract]
     void SendCommandSync(uint handle, byte address, byte command, byte[] parameters);
+    [OperationContract]
+    void SetADCFreq(uint handle, byte address, int frequency);
+    [OperationContract]
+    void StartModule(uint handle, byte address);
+    [OperationContract]
+    void StopModule(uint handle, byte address);
+    [OperationContract]
+    Quantum GetQuant(uint handle);
   }
 
   [ServiceContract(CallbackContract = typeof(ICapdControlEmulatorEvents))]

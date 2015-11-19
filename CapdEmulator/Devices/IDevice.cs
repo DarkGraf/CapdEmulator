@@ -3,6 +3,14 @@ using System.Collections.Generic;
 
 namespace CapdEmulator.Devices
 {
+  interface IQuantumDevice
+  {
+    ModuleType ModuleId { get; }
+    byte ChannelId { get; }
+    DataType DataType { get; }
+    byte[] Data { get; }
+  }
+
   interface IDevice
   {
     int Handle { get; }
@@ -13,6 +21,10 @@ namespace CapdEmulator.Devices
     void Open();
     void Close();
     void SendCommandSync(byte address, Command command, byte[] parameters);
+    void SetADCFreq(uint handle, byte address, int frequency);
+    void StartModule(byte address);
+    void StopModule(byte address);
+    bool GetQuant(out IQuantumDevice quant);
   }
 
   interface IModule
@@ -28,6 +40,9 @@ namespace CapdEmulator.Devices
     IList<IModuleParameter> Parameters { get; }
 
     void Execute(Command command, byte[] parameters);
+    void SetADCFreq(int frequency);
+    void Start();
+    void Stop();
   }
 
   interface IModuleParameter

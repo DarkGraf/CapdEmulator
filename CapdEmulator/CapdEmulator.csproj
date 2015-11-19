@@ -56,10 +56,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Devices\Command.cs" />
+    <Compile Include="Devices\DataType.cs" />
     <Compile Include="Devices\Device.cs" />
     <Compile Include="Devices\IDevice.cs" />
     <Compile Include="Devices\Module.cs" />
     <Compile Include="Devices\ModuleParameter.cs" />
+    <Compile Include="Devices\ModuleThread.cs" />
     <Compile Include="Devices\ModuleType.cs" />
     <Compile Include="Models\MainModel.cs" />
     <Compile Include="Service\CapdControlEmulatorClient.cs" />

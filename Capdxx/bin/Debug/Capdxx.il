@@ -45,7 +45,7 @@
   .ver 1:0:0:0
 }
 .module Capdxx.dll
-// MVID: {A53B8C04-A630-4BAC-8525-6E358FE688FD}
+// MVID: {F0B4F1F4-19BD-48E9-9BA5-C0A648EF1D2A}
 .imagebase 0x10000000
 .file alignment 0x00000200
 .stackreserve 0x00100000
@@ -83,7 +83,7 @@
 .data VT_14 = int32(0)
 .data VT_15 = int32(0)
 .data VT_16 = int32(0)
-// Image base: 0x00480000
+// Image base: 0x002E0000
 
 
 // =============== CLASS MEMBERS DECLARATION ===================
@@ -181,27 +181,30 @@
           SendCommandSync(uint32 handle,
                           uint8 address,
                           uint8 command,
-                          native int param) cil managed
+                          native int param,
+                          int32 maxIndex) cil managed
   {
     .vtentry 1 : 5
     .export [5] as SendCommandSync
-    // Размер кода:       15 (0xf)
-    .maxstack  4
+    // Размер кода:       17 (0x11)
+    .maxstack  5
     .locals init ([0] bool CS$1$0000)
     IL_0000:  nop
     IL_0001:  ldarg.0
     IL_0002:  ldarg.1
     IL_0003:  ldarg.2
     IL_0004:  ldarg.3
-    IL_0005:  call       bool [CapdxxClient]CapdxxClient.Export::SendCommandSync(uint32,
+    IL_0005:  ldarg.s    maxIndex
+    IL_0007:  call       bool [CapdxxClient]CapdxxClient.Export::SendCommandSync(uint32,
                                                                                  uint8,
                                                                                  uint8,
-                                                                                 native int)
-    IL_000a:  stloc.0
-    IL_000b:  br.s       IL_000d
+                                                                                 native int,
+                                                                                 int32)
+    IL_000c:  stloc.0
+    IL_000d:  br.s       IL_000f
 
-    IL_000d:  ldloc.0
-    IL_000e:  ret
+    IL_000f:  ldloc.0
+    IL_0010:  ret
   } // end of method Export::SendCommandSync
 
   .method public hidebysig static bool 
@@ -209,27 +212,30 @@
           SendCommandAsync(uint32 handle,
                            uint8 address,
                            uint8 command,
-                           native int ptr) cil managed
+                           native int param,
+                           int32 maxIndex) cil managed
   {
     .vtentry 1 : 6
     .export [6] as SendCommandAsync
-    // Размер кода:       15 (0xf)
-    .maxstack  4
+    // Размер кода:       17 (0x11)
+    .maxstack  5
     .locals init ([0] bool CS$1$0000)
     IL_0000:  nop
     IL_0001:  ldarg.0
     IL_0002:  ldarg.1
     IL_0003:  ldarg.2
     IL_0004:  ldarg.3
-    IL_0005:  call       bool [CapdxxClient]CapdxxClient.Export::SendCommandAsync(uint32,
+    IL_0005:  ldarg.s    maxIndex
+    IL_0007:  call       bool [CapdxxClient]CapdxxClient.Export::SendCommandAsync(uint32,
                                                                                   uint8,
                                                                                   uint8,
-                                                                                  native int)
-    IL_000a:  stloc.0
-    IL_000b:  br.s       IL_000d
+                                                                                  native int,
+                                                                                  int32)
+    IL_000c:  stloc.0
+    IL_000d:  br.s       IL_000f
 
-    IL_000d:  ldloc.0
-    IL_000e:  ret
+    IL_000f:  ldloc.0
+    IL_0010:  ret
   } // end of method Export::SendCommandAsync
 
   .method public hidebysig static bool 
@@ -410,7 +416,7 @@
   .method public hidebysig static bool 
           marshal( int8) 
           GetQuant(uint32 handle,
-                  native int quant) cil managed
+                   native int& quant) cil managed
   {
     .vtentry 1 : 15
     .export [15] as GetQuant
@@ -421,7 +427,7 @@
     IL_0001:  ldarg.0
     IL_0002:  ldarg.1
     IL_0003:  call       bool [CapdxxClient]CapdxxClient.Export::GetQuant(uint32,
-                                                                         native int)
+                                                                          native int&)
     IL_0008:  stloc.0
     IL_0009:  br.s       IL_000b
 

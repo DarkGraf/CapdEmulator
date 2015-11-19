@@ -9,6 +9,11 @@ namespace CapdxxClient
 {
   public static class Export
   {
+    /// <summary>
+    /// Квант данных для метода GetQuant. Объявлен статическим в целях оптимизации.
+    /// </summary>
+    static IntPtr ptrQuant = IntPtr.Zero;
+
 #warning Если произошло исключение, то канал будет не рабочим в дальнейшем (например произвести поиск при выключенном сервисе).
     static ICapdEmulator proxyDevice = CapdEmulatorClient.CreateCapdEmulatorClient();
 
@@ -65,6 +70,7 @@ namespace CapdxxClient
 
     public static bool OpenDevice(uint handle)
     {
+      ptrQuant = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(QuantumDelphi)));
       proxyDevice.OpenDevice(handle);
       return true;
     }
@@ -72,21 +78,25 @@ namespace CapdxxClient
     public static bool CloseDevice(uint handle)
     {
       proxyDevice.CloseDevice(handle);
+      if (ptrQuant != IntPtr.Zero)
+      {
+        Marshal.FreeHGlobal(ptrQuant);
+        ptrQuant = IntPtr.Zero;
+      }
       return true;
     }
 
-    public static bool SendCommandSync(uint handle, byte address, byte command, IntPtr param)
+    public static bool SendCommandSync(uint handle, byte address, byte command, IntPtr param, int maxIndex)
     {
-#warning Добаввить параметр.
-      proxyDevice.SendCommandSync(handle, address, command, new byte[0]);
+      DelphiOpenArray<byte> bytes = new DelphiOpenArray<byte>(param, maxIndex);
+      proxyDevice.SendCommandSync(handle, address, command, bytes.Array);
       return true;
     }
 
-    public static bool SendCommandAsync(uint handle, byte address, byte command, IntPtr param)
+    public static bool SendCommandAsync(uint handle, byte address, byte command, IntPtr param, int maxIndex)
     {
-#warning Добаввить параметр.
-      DelphiDynArray<byte> bytes = new DelphiDynArray<byte>(param);
-      proxyDevice.SendCommandSync(handle, address, command, new byte[0]);
+      DelphiOpenArray<byte> bytes = new DelphiOpenArray<byte>(param, maxIndex);
+      proxyDevice.SendCommandSync(handle, address, command, bytes.Array);
       return true;
     }
 
@@ -97,16 +107,19 @@ namespace CapdxxClient
 
     public static bool StartModule(uint handle, byte address)
     {
+      proxyDevice.StartModule(handle, address);
       return true;
     }
 
     public static bool StopModule(uint handle, byte address)
     {
+      proxyDevice.StopModule(handle, address);
       return true;
     }
 
     public static bool SetADCFreq(uint handle, int address, int adcFreq)
     {
+      proxyDevice.SetADCFreq(handle, (byte)address, adcFreq);
       return true;
     }
 
@@ -130,9 +143,21 @@ namespace CapdxxClient
       return true;
     }
 
-    public static bool GetQuant(uint handle, IntPtr quant)
+    public static bool GetQuant(uint handle, ref IntPtr quant)
     {
-      return false;
+      if (ptrQuant == IntPtr.Zero)
+        return false;
+
+      Quantum quantumWcf = proxyDevice.GetQuant(handle);
+      if (quantumWcf.IsActual)
+      {
+        QuantumDelphi quantumDelphi = new QuantumDelphi(quantumWcf.ModuleId, 
+          quantumWcf.ChannelId, quantumWcf.DataType, quantumWcf.Data);
+        Marshal.StructureToPtr(quantumDelphi, ptrQuant, false);
+        quant = ptrQuant;
+      }
+
+      return quantumWcf.IsActual;
     }
 
     public static bool GetModuleParams(uint handle, byte address, IntPtr buffer, ref int size)
