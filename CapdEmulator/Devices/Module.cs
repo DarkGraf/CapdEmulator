@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace CapdEmulator.Devices
@@ -9,14 +10,21 @@ namespace CapdEmulator.Devices
     void Stop();
   }
 
-  abstract class ModuleBase : IModule
+  abstract class ModuleBase : IModule, IModuleInfo
   {
+    const int defaultFrequency = 1000;
+
     bool active;
     IModuleThread thread;
 
-    protected int Frequency { get; private set; }
+    #region IModuleInfo
 
-    public ModuleBase(ModuleType moduleType)
+    public int Frequency { get; private set; }
+    public ConcurrentQueue<IQuantumDevice> QuantumsQueue { get; private set; }
+
+    #endregion
+
+    public ModuleBase(ModuleType moduleType, ConcurrentQueue<IQuantumDevice> quantumsQueue)
     {
       Id = (byte)moduleType;
       ModuleType = moduleType;
@@ -24,6 +32,9 @@ namespace CapdEmulator.Devices
       GainFactor = 0;
       SplineLevel = 0;
       Parameters = new List<IModuleParameter>();
+
+      Frequency = defaultFrequency;
+      QuantumsQueue = quantumsQueue;
 
       active = false;
     }
@@ -84,7 +95,8 @@ namespace CapdEmulator.Devices
 
   class PressModule : ModuleBase
   {
-    public PressModule() : base(ModuleType.Press)
+    public PressModule(ConcurrentQueue<IQuantumDevice> quantumsQueue)
+      : base(ModuleType.Press, quantumsQueue)
     {
       Version = 5;
       Serial = 1000001;
@@ -109,7 +121,7 @@ namespace CapdEmulator.Devices
 
     protected override IModuleThread CreateThread()
     {
-      return new PressModuleThread();
+      return new PressModuleThread(this);
     }
 
     #endregion
@@ -117,7 +129,8 @@ namespace CapdEmulator.Devices
 
   class PulseModule : ModuleBase
   {
-    public PulseModule() : base(ModuleType.Pulse)
+    public PulseModule(ConcurrentQueue<IQuantumDevice> quantumsQueue)
+      : base(ModuleType.Pulse, quantumsQueue)
     {
       Version = 3;
       Serial = 1000002;
@@ -142,7 +155,7 @@ namespace CapdEmulator.Devices
 
     protected override IModuleThread CreateThread()
     {
-      return new PulseModuleThread();
+      return new PulseModuleThread(this);
     }
 
     #endregion
@@ -156,7 +169,7 @@ namespace CapdEmulator.Devices
       public void Stop() { }
     }
 
-    public NullModule() : base(ModuleType.Null) 
+    public NullModule() : base(ModuleType.Null, null) 
     {
       Version = 1;
       Serial = 1;

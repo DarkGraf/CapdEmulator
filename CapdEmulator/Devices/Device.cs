@@ -1,14 +1,33 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace CapdEmulator.Devices
 {
+  class QuantumDevice : IQuantumDevice
+  {
+    public QuantumDevice(ModuleType moduleId, byte channelId, DataType dataType, byte[] data)
+    {
+      ModuleId = moduleId;
+      ChannelId = channelId;
+      DataType = dataType;
+      Data = data;
+    }
+
+    public ModuleType ModuleId { get; private set; }
+    public byte ChannelId { get; private set; }
+    public DataType DataType { get; private set; }
+    public byte[] Data { get; private set; }
+  }
+
   class Device : IDevice
   {
     static readonly IModule nullModule = new NullModule();
+    static readonly IQuantumDevice nullQuantumDevice = new QuantumDevice(ModuleType.Null, 0, DataType.State, new byte[0]);
 
     bool active;
+    ConcurrentQueue<IQuantumDevice> quantumsQueue;
 
     public Device()
     {
@@ -17,6 +36,7 @@ namespace CapdEmulator.Devices
       Description = "Эмулятор CAPD v1.0.0.0";
       Modules = new List<IModule>();
       active = false;
+      quantumsQueue = new ConcurrentQueue<IQuantumDevice>();
     }
 
     /// <summary>
@@ -44,8 +64,8 @@ namespace CapdEmulator.Devices
     {
       if (!active)
       {
-        Modules.Add(new PressModule());
-        Modules.Add(new PulseModule());
+        Modules.Add(new PressModule(quantumsQueue));
+        Modules.Add(new PulseModule(quantumsQueue));
         active = true;
       }
     }
@@ -85,26 +105,23 @@ namespace CapdEmulator.Devices
 
     public bool GetQuant(out IQuantumDevice quant)
     {
-      quant = new QuantumDevice(ModuleType.Null, 0, DataType.Data, null);
-      return false;
+      bool result = !quantumsQueue.IsEmpty;
+
+      if (result)
+      {
+        result = quantumsQueue.TryDequeue(out quant);
+        if (!result)
+        {
+          quant = nullQuantumDevice;
+        }
+      }
+      else
+      {
+        quant = nullQuantumDevice;
+      }
+      return result;
     }
 
     #endregion
-  }
-
-  class QuantumDevice : IQuantumDevice
-  {
-    public QuantumDevice(ModuleType moduleId, byte channelId, DataType dataType, byte[] data)
-    {
-      ModuleId = moduleId;
-      ChannelId = channelId;
-      DataType = dataType;
-      Data = data;
-    }
-
-    public ModuleType ModuleId { get; private set; }
-    public byte ChannelId { get; private set; }
-    public DataType DataType { get; private set; }
-    public byte[] Data { get; private set; }
   }
 }

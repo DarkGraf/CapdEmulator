@@ -1,17 +1,27 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Threading;
 
 namespace CapdEmulator.Devices
 {
+  interface IModuleInfo
+  {
+    int Frequency { get; }
+    ConcurrentQueue<IQuantumDevice> QuantumsQueue { get; }
+  }
+
   abstract class ModuleThreadBase : IModuleThread
   {
     private volatile bool shouldStop;
     private Thread thread;
 
-    public ModuleThreadBase()
+    protected IModuleInfo ModuleInfo { get; private set; }
+
+    public ModuleThreadBase(IModuleInfo moduleInfo)
     {
       shouldStop = false;
       thread = new Thread(DoWork);
+      ModuleInfo = moduleInfo;
     }
 
     private void DoWork()
@@ -42,11 +52,11 @@ namespace CapdEmulator.Devices
 
   class PressModuleThread: ModuleThreadBase
   {
-
+    public PressModuleThread(IModuleInfo moduleInfo) : base(moduleInfo) { }
   }
 
   class PulseModuleThread : ModuleThreadBase
   {
-
+    public PulseModuleThread(IModuleInfo moduleInfo) : base(moduleInfo) { }
   }
 }

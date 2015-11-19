@@ -131,16 +131,14 @@ namespace CapdEmulator.Service
 
     public Quantum GetQuant(uint handle)
     {
-      CommandReceived();
-      IQuantumDevice quant;
+      IQuantumDevice quantumDevice;
       // Если метод вернет истину, значит квант получили.
-      currentQuantum.IsActual = device.GetQuant(out quant);
-      if (currentQuantum.IsActual)
+      if (currentQuantum.IsActual = device.GetQuant(out quantumDevice))
       {
-        currentQuantum.ModuleId = (byte)quant.ModuleId;
-        currentQuantum.ChannelId = quant.ChannelId;
-        currentQuantum.DataType = (byte)quant.DataType;
-        currentQuantum.Data = quant.Data;
+        currentQuantum.ModuleId = (byte)quantumDevice.ModuleId;
+        currentQuantum.ChannelId = quantumDevice.ChannelId;
+        currentQuantum.DataType = (byte)quantumDevice.DataType;
+        currentQuantum.Data = quantumDevice.Data;
       }    
 
       return currentQuantum;
