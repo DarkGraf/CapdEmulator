@@ -10,19 +10,15 @@ namespace CapdEmulator.Devices
     void Stop();
   }
 
-  abstract class ModuleBase : IModule, IModuleInfo
+  abstract class ModuleBase : IModule, IModuleContext
   {
     const int defaultFrequency = 1000;
 
     bool active;
     IModuleThread thread;
 
-    #region IModuleInfo
-
     public int Frequency { get; private set; }
     public ConcurrentQueue<IQuantumDevice> QuantumsQueue { get; private set; }
-
-    #endregion
 
     public ModuleBase(ModuleType moduleType, ConcurrentQueue<IQuantumDevice> quantumsQueue)
     {
@@ -121,7 +117,7 @@ namespace CapdEmulator.Devices
 
     protected override IModuleThread CreateThread()
     {
-      return new PressModuleThread(this);
+      return new ModuleThread(this, new PressNullGenerator(Frequency));
     }
 
     #endregion
@@ -138,8 +134,9 @@ namespace CapdEmulator.Devices
 
       Parameters.Add(new ModuleParameter(1, 22, ModuleParameterDescription.digitCapacityAdc));
       Parameters.Add(new ModuleParameter(2, 5, ModuleParameterDescription.levelIonAdc));
-      Parameters.Add(new ModuleParameter(11, 149.0191803, ModuleParameterDescription.channelPulse));
+      Parameters.Add(new ModuleParameter(11, 149.0191803, ModuleParameterDescription.channelPulse));      
       Parameters.Add(new ModuleParameter(51, 8, ModuleParameterDescription.digitCapacityDac));
+      //Parameters.Add(new ModuleParameter(51, 0, ModuleParameterDescription.digitCapacityDac)); // Нет аппаратного интегратора.
       Parameters.Add(new ModuleParameter(52, 5, ModuleParameterDescription.levelIonDac));
       Parameters.Add(new ModuleParameter(53, 10.1, ModuleParameterDescription.dacToAdc));
       Parameters.Add(new ModuleParameter(70, 2232, ModuleParameterDescription.frequency));
@@ -155,7 +152,7 @@ namespace CapdEmulator.Devices
 
     protected override IModuleThread CreateThread()
     {
-      return new PulseModuleThread(this);
+      return new ModuleThread(this, new PulseSinusGenerator(Frequency));
     }
 
     #endregion

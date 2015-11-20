@@ -63,6 +63,7 @@
     <Compile Include="Devices\ModuleParameter.cs" />
     <Compile Include="Devices\ModuleThread.cs" />
     <Compile Include="Devices\ModuleType.cs" />
+    <Compile Include="Devices\SignalGenerator.cs" />
     <Compile Include="Models\MainModel.cs" />
     <Compile Include="Service\CapdControlEmulatorClient.cs" />
     <Compile Include="Service\CapdEmulatorAddress.cs" />

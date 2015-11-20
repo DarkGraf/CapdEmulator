@@ -51,4 +51,13 @@ namespace CapdEmulator.Devices
     double Value { get; }
     string Description { get; }
   }
+
+  /// <summary>
+  /// Поддержка модулем платы DAC.
+  /// </summary>
+  interface IModuleDacSupport
+  {
+    bool SetDACLevel(byte dacLevel);
+    bool SetZeroDAC();
+  }
 }
