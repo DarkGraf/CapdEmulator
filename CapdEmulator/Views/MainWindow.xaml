@@ -3,16 +3,23 @@
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:viewmodels="clr-namespace:CapdEmulator.ViewModels"
-  Title="MainWindow" Height="350" Width="525">
+  Title="MainWindow" Height="500" Width="600">
   <Window.DataContext>
     <viewmodels:MainViewModel />
   </Window.DataContext>
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition />
+      <RowDefinition Height="Auto" />
       <RowDefinition />
     </Grid.RowDefinitions>
-    <Button Content="Active" Command="{Binding ActiveCommand}" />
-    <ListBox Grid.Row="1" ItemsSource="{Binding Messages}" />
+    <Canvas Grid.Row="0">
+      <!-- A raduisX, radiusY, degrees, isLargArc, IaClockwize, x, y-->
+      <Path
+        Stroke="Black"
+        Data="M 10 10 h 400 a 10 10 45 0 1 10 10" />
+    </Canvas>
+    <Button Grid.Row="1" Content="Active" Command="{Binding ActiveCommand}" />
+    <ListBox Grid.Row="2" ItemsSource="{Binding Messages}" />
   </Grid>
 </Window>
