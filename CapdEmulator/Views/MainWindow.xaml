@@ -13,12 +13,30 @@
       <RowDefinition Height="Auto" />
       <RowDefinition />
     </Grid.RowDefinitions>
-    <Canvas Grid.Row="0">
-      <!-- A raduisX, radiusY, degrees, isLargArc, IaClockwize, x, y-->
-      <Path
-        Stroke="Black"
-        Data="M 10 10 h 400 a 10 10 45 0 1 10 10" />
-    </Canvas>
+    <Viewbox Grid.Row="0">
+      <Canvas Width="280" Height="120">
+        <!-- A raduisX, radiusY, degrees, isLargArc, IaClockwize, x, y -->
+        <Path
+          Stroke="#FF888888"
+          StrokeThickness="2"
+          Fill="#FFE3E3E3"
+          Data="M 10 5 h 260 a 5 5 45 0 1 5 5 v 100 a 5 5 45 0 1 -5 5 h -260 a 5 5 45 0 1 -5 -5 v -100 a 5 5 45 0 1 5 -5 z" />
+        
+        <!-- Разделение модулей. -->
+        <Line Stroke="#FF888888" X1="14" Y1="5" X2="14" Y2="115" />
+        <Line Stroke="#FF888888" X1="90" Y1="5" X2="90" Y2="115" />
+        <Line Stroke="#FF888888" X1="116" Y1="5" X2="116" Y2="115" />
+        <Line Stroke="#FF888888" X1="142" Y1="5" X2="142" Y2="115" />
+        <Line Stroke="#FF888888" X1="168" Y1="5" X2="168" Y2="115" />
+        <Line Stroke="#FF888888" X1="194" Y1="5" X2="194" Y2="115" />
+        <Line Stroke="#FF888888" X1="220" Y1="5" X2="220" Y2="115" />
+        <Line Stroke="#FF888888" X1="266" Y1="5" X2="266" Y2="115" />
+        
+        <!-- Нижняя полоска. -->
+        <Line Stroke="#FF888888" X1="14" Y1="100" X2="266" Y2="100" />
+        <Line Stroke="#FF888888" X1="14" Y1="110" X2="266" Y2="110" />
+      </Canvas>
+    </Viewbox>
     <Button Grid.Row="1" Content="Active" Command="{Binding ActiveCommand}" />
     <ListBox Grid.Row="2" ItemsSource="{Binding Messages}" />
   </Grid>

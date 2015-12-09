@@ -85,6 +85,10 @@ namespace CapdEmulator.Service
     void StopModule(uint handle, byte address);
     [OperationContract]
     Quantum GetQuant(uint handle);
+    [OperationContract]
+    bool SetDACLevel(uint handle, byte address, byte dacLevel);
+    [OperationContract]
+    bool SetZeroDAC(uint handle, byte address);
   }
 
   [ServiceContract(CallbackContract = typeof(ICapdControlEmulatorEvents))]

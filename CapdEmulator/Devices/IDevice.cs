@@ -25,6 +25,8 @@ namespace CapdEmulator.Devices
     void StartModule(byte address);
     void StopModule(byte address);
     bool GetQuant(out IQuantumDevice quant);
+    bool SetDACLevel(byte address, byte dacLevel);
+    bool SetZeroDAC(byte address);
   }
 
   interface IModule
@@ -57,6 +59,11 @@ namespace CapdEmulator.Devices
   /// </summary>
   interface IModuleDacSupport
   {
+    /// <summary>
+    /// Устанавливает уровень DAC. Должен послать сообщение-состояние Command.msgDACOps об установке уровня.
+    /// </summary>
+    /// <param name="dacLevel"></param>
+    /// <returns></returns>
     bool SetDACLevel(byte dacLevel);
     bool SetZeroDAC();
   }

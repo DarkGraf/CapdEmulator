@@ -18,6 +18,10 @@ namespace CapdEmulator.Devices
     /// </summary>
     Pulse = 4,
     /// <summary>
+    /// Экг
+    /// </summary>
+    Ecg = 5,
+    /// <summary>
     /// Каркас (14).
     /// </summary>
     Carcas = 14,

@@ -5,6 +5,14 @@ using System.Linq;
 
 namespace CapdEmulator.Devices
 {
+  /// <summary>
+  /// Фабрика модулей для устройства.
+  /// </summary>
+  interface IModuleFactory
+  {
+    bool TryCreate(ModuleType moduleType, ConcurrentQueue<IQuantumDevice> quantumsQueue, out IModule module);
+  }
+
   class QuantumDevice : IQuantumDevice
   {
     public QuantumDevice(ModuleType moduleId, byte channelId, DataType dataType, byte[] data)
@@ -23,20 +31,26 @@ namespace CapdEmulator.Devices
 
   class Device : IDevice
   {
-    static readonly IModule nullModule = new NullModule();
     static readonly IQuantumDevice nullQuantumDevice = new QuantumDevice(ModuleType.Null, 0, DataType.State, new byte[0]);
 
-    bool active;
-    ConcurrentQueue<IQuantumDevice> quantumsQueue;
+    readonly IModuleFactory moduleFactory;
 
-    public Device()
+    bool active;
+    readonly ConcurrentQueue<IQuantumDevice> quantumsQueue;
+    readonly IModule nullModule;
+
+    public Device(IModuleFactory moduleFactory)
     {
+      this.moduleFactory = moduleFactory;
+
       Handle = new Random().Next();
       Version = 3;
       Description = "Эмулятор CAPD v1.0.0.0";
       Modules = new List<IModule>();
       active = false;
       quantumsQueue = new ConcurrentQueue<IQuantumDevice>();
+
+      moduleFactory.TryCreate(ModuleType.Null, quantumsQueue, out nullModule);
     }
 
     /// <summary>
@@ -64,8 +78,14 @@ namespace CapdEmulator.Devices
     {
       if (!active)
       {
-        Modules.Add(new PressModule(quantumsQueue));
-        Modules.Add(new PulseModule(quantumsQueue));
+        foreach (ModuleType type in new ModuleType[] { ModuleType.Press, ModuleType.Pulse, ModuleType.Ecg })
+        {
+          IModule module;
+          if (moduleFactory.TryCreate(type, quantumsQueue, out module))
+          {
+            Modules.Add(module);
+          }
+        }
         active = true;
       }
     }
@@ -120,6 +140,26 @@ namespace CapdEmulator.Devices
         quant = nullQuantumDevice;
       }
       return result;
+    }
+
+    public bool SetDACLevel(byte address, byte dacLevel)
+    {
+      IModuleDacSupport module = GetModule(address) as IModuleDacSupport;
+      if (module != null)
+      {
+        module.SetDACLevel(dacLevel);
+      }
+      return true;
+    }
+
+    public bool SetZeroDAC(byte address)
+    {
+      IModuleDacSupport module = GetModule(address) as IModuleDacSupport;
+      if (module != null)
+      {
+        module.SetZeroDAC();
+      }
+      return true;
     }
 
     #endregion

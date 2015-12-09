@@ -66,6 +66,16 @@ namespace CapdEmulator.Service
       return Channel.GetQuant(handle); 
     }
 
+    public bool SetDACLevel(uint handle, byte address, byte dacLevel)
+    {
+      return Channel.SetDACLevel(handle, address, dacLevel);
+    }
+
+    public bool SetZeroDAC(uint handle, byte address)
+    {
+      return Channel.SetZeroDAC(handle, address);
+    }
+
     #endregion
   }
 }

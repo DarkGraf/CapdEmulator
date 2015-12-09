@@ -125,12 +125,12 @@ namespace CapdxxClient
 
     public static bool SetDACLevel(uint handle, byte address, byte dacLevel)
     {
-      return true;
+      return proxyDevice.SetDACLevel(handle, address, dacLevel);
     }
 
     public static bool SetZeroDAC(uint handle, byte address)
     {
-      return true;
+      return proxyDevice.SetZeroDAC(handle, address);
     }
 
     public static void LogMessage(IntPtr text, bool newFile)

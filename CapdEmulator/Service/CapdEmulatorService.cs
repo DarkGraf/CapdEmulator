@@ -26,7 +26,7 @@ namespace CapdEmulator.Service
 
     protected CapdEmulatorService() 
     {
-      device = new Device();
+      device = new Device(new ModuleFactory());
       callbacks = new List<ICapdControlEmulatorEvents>();
       currentQuantum = new Quantum();
     }
@@ -142,6 +142,16 @@ namespace CapdEmulator.Service
       }    
 
       return currentQuantum;
+    }
+
+    public bool SetDACLevel(uint handle, byte address, byte dacLevel)
+    {
+      return device.SetDACLevel(address, dacLevel);
+    }
+
+    public bool SetZeroDAC(uint handle, byte address)
+    {
+      return device.SetZeroDAC(address);
     }
 
     #endregion

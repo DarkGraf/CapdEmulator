@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace CapdEmulator.Devices
 {
-  interface IModuleContext
+  interface IThreadModuleContext
   {
     ModuleType ModuleType { get; }
     ConcurrentQueue<IQuantumDevice> QuantumsQueue { get; }
@@ -18,16 +18,20 @@ namespace CapdEmulator.Devices
     /// В одной секунде содержится Frequency моментов времени.
     /// </summary>
     int Calculate(int timePoint);
+    /// <summary>
+    /// Выполнение команды.
+    /// </summary>
+    void Execute(Command command);
   }
 
   class ModuleThread : IModuleThread
   {
     private volatile bool shouldStop;
     private Thread thread;
-    private IModuleContext moduleContext;
+    private IThreadModuleContext moduleContext;
     private ISignalGenerator signalGenerator;
 
-    public ModuleThread(IModuleContext moduleContext, ISignalGenerator signalGenerator)
+    public ModuleThread(IThreadModuleContext moduleContext, ISignalGenerator signalGenerator)
     {
       shouldStop = false;
       thread = new Thread(DoWork);
