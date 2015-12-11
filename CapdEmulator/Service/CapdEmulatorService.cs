@@ -1,32 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.ServiceModel;
 
 using CapdEmulator.Devices;
-using System.Runtime.CompilerServices;
 
 namespace CapdEmulator.Service
 {
   [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, UseSynchronizationContext = false)]
   class CapdEmulatorService : ICapdEmulator, ICapdControlEmulator
   {
-    private IDevice device;
-    private IList<ICapdControlEmulatorEvents> callbacks;
+    readonly private IDevice device;
+    readonly private IList<ICapdControlEmulatorEvents> callbacks;
     // Для оптимизации работы метода GetQuant создадим квант один раз.
     private Quantum currentQuantum;
 
-    public static ServiceHost CreateCapdEmulatorService()
+    public static ServiceHost CreateCapdEmulatorServiceHost(IDevice device)
     {
-      ServiceHost serviceHost = new ServiceHost(typeof(CapdEmulatorService), CapdEmulatorAddress.GetServiceUri());
+      CapdEmulatorService service = new CapdEmulatorService(device);
+      ServiceHost serviceHost = new ServiceHost(service, CapdEmulatorAddress.GetServiceUri());
       serviceHost.AddServiceEndpoint(typeof(ICapdEmulator), CapdEmulatorAddress.GetBinding(), CapdEmulatorAddress.GetCapdEmulatorUri());
       serviceHost.AddServiceEndpoint(typeof(ICapdControlEmulator), CapdEmulatorAddress.GetBinding(), CapdEmulatorAddress.GetCapdControlEmulatorUri());
       return serviceHost;
     }
 
-    protected CapdEmulatorService() 
+    protected CapdEmulatorService(IDevice device) 
     {
-      device = new Device(new ModuleFactory());
+      this.device = device;
+      // Список для обратной связи.
       callbacks = new List<ICapdControlEmulatorEvents>();
       currentQuantum = new Quantum();
     }

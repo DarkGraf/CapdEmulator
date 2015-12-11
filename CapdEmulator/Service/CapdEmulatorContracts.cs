@@ -99,7 +99,9 @@ namespace CapdEmulator.Service
     /// </summary>
     [OperationContract]
     void Connect();
+    /// <summary>
     /// Уведомление об отключения обратного вызова.
+    /// </summary>
     [OperationContract]
     void Disconnect();
   }
@@ -111,6 +113,9 @@ namespace CapdEmulator.Service
     event EventHandler<CommandReceivedEventArgs> CommandReceived;
   }
 
+  /// <summary>
+  /// Контракт службы обратного вызова.
+  /// </summary>
   public interface ICapdControlEmulatorEvents
   {
     [OperationContract(IsOneWay = true)]

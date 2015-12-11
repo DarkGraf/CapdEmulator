@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CapdEmulator.Devices
 {
@@ -117,6 +118,17 @@ namespace CapdEmulator.Devices
     }
 
     #endregion
+
+    #region ISignalModuleContext
+
+    // Свойство int Frequency { get; } описано выше.
+
+    public double GetParameter(int id)
+    {
+      return Parameters.FirstOrDefault(m => m.Id == id).Value;
+    }
+
+    #endregion
   }
 
   class PressModule : ModuleBase
@@ -154,6 +166,9 @@ namespace CapdEmulator.Devices
           break;
         case Command.opPumpOn:
           PostQuantum(moduleChannel, DataType.State, (byte)Command.msgPumpOn);
+          break;
+        case Command.opPumpOff:
+          PostQuantum(moduleChannel, DataType.State, (byte)Command.msgPumpOff);
           break;
       }
     }
@@ -241,13 +256,18 @@ namespace CapdEmulator.Devices
   /// </summary>
   class ModuleFactory : IModuleFactory
   {
+    ISignalGeneratorFactory signalGeneratorFactory;
+
+    public ModuleFactory(ISignalGeneratorFactory signalGeneratorFactory)
+    {
+      this.signalGeneratorFactory = signalGeneratorFactory;
+    }
+
     #region IModuleFactory
 
     public bool TryCreate(ModuleType moduleType, ConcurrentQueue<IQuantumDevice> quantumsQueue, out IModule module)
     {
       module = null;
-
-      ISignalGeneratorFactory signalGeneratorFactory = new SignalGeneratorFactory();
 
       switch (moduleType)
       {

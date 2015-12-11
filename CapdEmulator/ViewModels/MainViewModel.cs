@@ -7,13 +7,14 @@ using CapdEmulator.WpfUtility;
 
 namespace CapdEmulator.ViewModels
 {
-  class MainViewModel
+  class MainViewModel : ChangeableObject
   {
     MainModel model;
 
     public MainViewModel()
     {
       model = new MainModel();
+      model.PropertyChanged += (s, e) => { NotifyPropertyChanged(e.PropertyName); };
 
       ActiveCommand = new RelayCommand((obj) => 
         {
@@ -26,6 +27,11 @@ namespace CapdEmulator.ViewModels
     public ObservableCollection<string> Messages 
     {
       get { return model.Messages; }
+    }
+
+    public double Press 
+    { 
+      get { return model.Press; } 
     }
   }
 }

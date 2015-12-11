@@ -9,18 +9,26 @@
   </Window.DataContext>
   <Grid>
     <Grid.RowDefinitions>
-      <RowDefinition />
+      <RowDefinition Height="2*" />
       <RowDefinition Height="Auto" />
-      <RowDefinition />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="1*" />
     </Grid.RowDefinitions>
+    
+    <!-- Изображение блока. -->
     <Viewbox Grid.Row="0">
       <Canvas Width="280" Height="120">
         <!-- A raduisX, radiusY, degrees, isLargArc, IaClockwize, x, y -->
-        <Path
+        <!--Path
           Stroke="#FF888888"
           StrokeThickness="2"
           Fill="#FFE3E3E3"
-          Data="M 10 5 h 260 a 5 5 45 0 1 5 5 v 100 a 5 5 45 0 1 -5 5 h -260 a 5 5 45 0 1 -5 -5 v -100 a 5 5 45 0 1 5 -5 z" />
+          Data="M 10 5 h 260 a 5 5 45 0 1 5 5 v 100 a 5 5 45 0 1 -5 5 h -260 a 5 5 45 0 1 -5 -5 v -100 a 5 5 45 0 1 5 -5 z" /-->
+        
+        <Rectangle 
+          Canvas.Top="5" Canvas.Left="5"
+          Stroke="#FF888888" StrokeThickness="2" Fill="#FFE3E3E3"
+          Width="270" Height="110" RadiusX="5" RadiusY="5" />
         
         <!-- Разделение модулей. -->
         <Line Stroke="#FF888888" X1="14" Y1="5" X2="14" Y2="115" />
@@ -35,9 +43,45 @@
         <!-- Нижняя полоска. -->
         <Line Stroke="#FF888888" X1="14" Y1="100" X2="266" Y2="100" />
         <Line Stroke="#FF888888" X1="14" Y1="110" X2="266" Y2="110" />
+        
+        <!-- Заголовок на блоке давления. -->
+        <Label Canvas.Top="16" Canvas.Left="21" Content="Системные технологии" Foreground="#FF6C737B" FontSize="5" />
+        <Label Canvas.Top="25" Canvas.Left="25" Content="Комплекс автоматизированного" Foreground="#FF6C737B" FontSize="3" />
+        <Label Canvas.Top="28" Canvas.Left="33" Content="осмотра КАПД-02-СТ" Foreground="#FF6C737B" FontSize="3" />
       </Canvas>
     </Viewbox>
-    <Button Grid.Row="1" Content="Active" Command="{Binding ActiveCommand}" />
-    <ListBox Grid.Row="2" ItemsSource="{Binding Messages}" />
+    
+    <!-- Управление блоком. -->
+    <Grid Grid.Row="1">
+      <Grid.Resources>
+        <Style TargetType="{x:Type Label}">
+          <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+      </Grid.Resources>
+      
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition />
+        <ColumnDefinition />
+        <ColumnDefinition />
+      </Grid.ColumnDefinitions>
+      
+      <Grid.RowDefinitions>
+        <RowDefinition />
+        <RowDefinition />
+      </Grid.RowDefinitions>
+      
+      <!-- Блок давления. -->
+      <Label Grid.Column="0" Grid.Row="0" Content="Блок давления" />
+      <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding Press}" />
+
+      <!-- Блок пульса. -->
+      <Label Grid.Column="1" Grid.Row="0" Content="Блок пульса" />
+
+      <!-- Блок ЭКГ. -->
+      <Label Grid.Column="2" Grid.Row="0" Content="Блок ЭКГ" />
+    </Grid>
+    
+    <Button Grid.Row="2" Content="Active" Command="{Binding ActiveCommand}" />
+    <ListBox Grid.Row="3" ItemsSource="{Binding Messages}" />
   </Grid>
 </Window>

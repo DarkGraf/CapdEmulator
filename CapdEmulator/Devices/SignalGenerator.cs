@@ -5,23 +5,23 @@ namespace CapdEmulator.Devices
   interface ISignalModuleContext
   {
     int Frequency { get; }
+    double GetParameter(int id);
   }
-
 
   abstract class SignalGeneratorBase : ISignalGenerator
   {
-    ISignalModuleContext moduleContext;
+    protected ISignalModuleContext ModuleContext { get; private set; }
 
     public SignalGeneratorBase(ISignalModuleContext moduleContext)
     {
-      this.moduleContext = moduleContext;
+      ModuleContext = moduleContext;
     }
 
     #region ISignalGenerator
 
     public int Frequency 
     {
-      get { return moduleContext.Frequency; }
+      get { return ModuleContext.Frequency; }
     }
 
     public abstract int Calculate(int timePoint);
@@ -53,8 +53,19 @@ namespace CapdEmulator.Devices
     #endregion
   }
 
+  interface IPressVisualContext
+  {
+    int Sistol { get; }
+    int Diastol { get; }
+
+    void NotifyPressChanged(double press);
+    event EventHandler<double> PressChanged;
+  }
+
   class PressSinusGenerator : SignalGeneratorBase
   {
+    IPressVisualContext visualContext;
+
     /// <summary>
     /// Текущее значение сигнала давления.
     /// </summary>
@@ -75,7 +86,7 @@ namespace CapdEmulator.Devices
     /// <summary>
     /// Уменьшение давления при закрытом клапане.
     /// </summary>
-    int decreaseForGateOn = 10;
+    int decreaseForGateOn = 50;
     /// <summary>
     /// Увеличение давления при неработающем компрессоре.
     /// </summary>
@@ -83,10 +94,14 @@ namespace CapdEmulator.Devices
     /// <summary>
     /// Увеличение давления при работающем компрессоре.
     /// </summary>
-    int increaseForPumpOn = 100;
+    int increaseForPumpOn = 300;
 
-    public PressSinusGenerator(ISignalModuleContext moduleContext) : base(moduleContext) 
+    double? gain;
+
+    public PressSinusGenerator(ISignalModuleContext moduleContext, IPressVisualContext visualContext) : base(moduleContext) 
     {
+      this.visualContext = visualContext;
+
       // Проинициализируем внутреннее состояние.
       currentValue = 0;
       currentDecrease = decreaseForGateOff;
@@ -97,8 +112,49 @@ namespace CapdEmulator.Devices
     
     public override int Calculate(int timePoint)
     {
+      if (!gain.HasValue)
+      {
+        // Расчитаем коэфициент усиления.
+        double par1 = ModuleContext.GetParameter(1);
+        double par2 = ModuleContext.GetParameter(2);
+        double par11 = ModuleContext.GetParameter(11);
+        double par51 = ModuleContext.GetParameter(51);
+        double adcCapacity = Math.Pow(2, par1);
+        gain = 7.5 * par2 / adcCapacity / par11 / par51;
+      }
+
+      // Постоянная составляющая давления.
       currentValue = currentValue + currentIncrease - currentDecrease;
       currentValue = Math.Max(0, currentValue);
+      double press = currentValue * gain.Value;
+
+      // Если это первый заход или пошла новая секунда,
+      // то оповестим визуальный контекст о текущем давлении.
+      if (timePoint == 0 || (timePoint - 1) / Frequency < timePoint / Frequency)
+      {
+        visualContext.NotifyPressChanged(press);
+      }
+
+      // Если постоянная составляющая давления попадает в интервал
+      // установленного давления, добавим сигнал синуса.
+      double ampl;
+      if (press >= visualContext.Diastol && press <= visualContext.Sistol)
+      {
+        double koef = Math.Sin(Math.PI / (visualContext.Sistol - visualContext.Diastol) * (visualContext.Sistol - press));
+        ampl = 100 + koef * 900;
+
+      }
+      else if (press > 5) // При давлении больше 5, начнем подавать ЧСС.
+      {
+        ampl = 100;
+      }
+      else
+      {
+        ampl = 0;
+      }
+
+      currentValue += (int)(Math.Sin(2 * Math.PI / Frequency * timePoint) * (ampl));
+
       return currentValue;
     }
 
@@ -140,6 +196,13 @@ namespace CapdEmulator.Devices
 
   class SignalGeneratorFactory : ISignalGeneratorFactory
   {
+    IPressVisualContext pressVisualContext;
+
+    public SignalGeneratorFactory(IPressVisualContext pressVisualContext)
+    {
+      this.pressVisualContext = pressVisualContext;
+    }
+
     #region ISignalGeneratorFactory
 
     public ISignalGenerator Create(ModuleType moduleType, ISignalModuleContext moduleContext)
@@ -149,7 +212,7 @@ namespace CapdEmulator.Devices
         case ModuleType.Pulse:
           return new PulseSinusGenerator(moduleContext);
         case ModuleType.Press:
-          return new PressSinusGenerator(moduleContext);
+          return new PressSinusGenerator(moduleContext, pressVisualContext);
         default:
           return new NullSignalGenerator(moduleContext);
       }
