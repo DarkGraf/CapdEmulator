@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapdxxClient", "CapdxxClien
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapdEmulator", "CapdEmulator\CapdEmulator.csproj", "{EC332654-DA1E-4ED6-8357-C4B74C1ABF8C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapdxxTester", "CapdxxTester\CapdxxTester.csproj", "{0895B915-36EA-4C8F-AF1F-4B1B3E234ECC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{EC332654-DA1E-4ED6-8357-C4B74C1ABF8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC332654-DA1E-4ED6-8357-C4B74C1ABF8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC332654-DA1E-4ED6-8357-C4B74C1ABF8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0895B915-36EA-4C8F-AF1F-4B1B3E234ECC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0895B915-36EA-4C8F-AF1F-4B1B3E234ECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0895B915-36EA-4C8F-AF1F-4B1B3E234ECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0895B915-36EA-4C8F-AF1F-4B1B3E234ECC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
