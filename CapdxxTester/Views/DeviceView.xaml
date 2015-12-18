@@ -1,0 +1,48 @@
+﻿<UserControl 
+  x:Class="CapdxxTester.Views.DeviceView"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+  xmlns:viewmodels="clr-namespace:CapdxxTester.ViewModels"
+  mc:Ignorable="d" 
+  d:DesignHeight="300" d:DesignWidth="300">
+
+  <DockPanel>
+    <!-- Информация об устройстве. -->
+    <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+      <TextBlock 
+        Margin="7"
+        VerticalAlignment="Center" 
+        HorizontalAlignment="Center" 
+        FontSize="14" 
+        FontWeight="Bold"
+        Foreground="#FF505050">
+        <Run Text="Устройство:" />
+        <Run Text="{Binding Description, Mode=OneWay}" />
+        <Run Text="версия:" />
+        <Run Text="{Binding Version, Mode=OneWay}" />
+      </TextBlock>
+    </StackPanel>
+
+    <TabControl 
+      ItemsSource="{Binding ModuleViewModels}" 
+      SelectedItem="{Binding SelectedModuleViewModel}">
+      <!-- Заголовок. -->
+      <TabControl.ItemTemplate>
+        <DataTemplate>
+          <StackPanel Orientation="Horizontal">
+            <Image Source="{Binding Image}" Stretch="None" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding Title}" VerticalAlignment="Center" FontSize="20" Margin="5" />
+          </StackPanel>
+        </DataTemplate>
+      </TabControl.ItemTemplate>
+      <!-- Содержание. -->
+      <TabControl.ContentTemplate>
+        <DataTemplate>
+          <ContentControl Content="{Binding}" />
+        </DataTemplate>
+      </TabControl.ContentTemplate>
+    </TabControl>
+  </DockPanel>
+</UserControl>

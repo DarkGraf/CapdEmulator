@@ -86,7 +86,7 @@ namespace CapdEmulator.Devices
     /// <summary>
     /// Уменьшение давления при закрытом клапане.
     /// </summary>
-    int decreaseForGateOn = 50;
+    int decreaseForGateOn = 60;
     /// <summary>
     /// Увеличение давления при неработающем компрессоре.
     /// </summary>
@@ -94,7 +94,7 @@ namespace CapdEmulator.Devices
     /// <summary>
     /// Увеличение давления при работающем компрессоре.
     /// </summary>
-    int increaseForPumpOn = 300;
+    int increaseForPumpOn = 400;
 
     double? gain;
 
@@ -141,12 +141,11 @@ namespace CapdEmulator.Devices
       if (press >= visualContext.Diastol && press <= visualContext.Sistol)
       {
         double koef = Math.Sin(Math.PI / (visualContext.Sistol - visualContext.Diastol) * (visualContext.Sistol - press));
-        ampl = 100 + koef * 900;
-
+        ampl = 50 + koef * 950;
       }
       else if (press > 5) // При давлении больше 5, начнем подавать ЧСС.
       {
-        ampl = 100;
+        ampl = 50;
       }
       else
       {

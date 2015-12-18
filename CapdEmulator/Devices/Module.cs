@@ -142,9 +142,9 @@ namespace CapdEmulator.Devices
 
       Parameters.Add(new ModuleParameter(1, 24, ModuleParameterDescription.digitCapacityAdc));
       Parameters.Add(new ModuleParameter(2, 10, ModuleParameterDescription.levelIonAdc));
-      Parameters.Add(new ModuleParameter(11, 132.00047302, ModuleParameterDescription.channelPulse));
-      Parameters.Add(new ModuleParameter(12, 132.00047302, ModuleParameterDescription.channelPulse));
-      Parameters.Add(new ModuleParameter(51, 0.00079999997979, ModuleParameterDescription.channelPress));
+      Parameters.Add(new ModuleParameter(11, 132.00047302, ModuleParameterDescription.channelVariablePress));
+      Parameters.Add(new ModuleParameter(12, 132.00047302, ModuleParameterDescription.channelConstantPress));
+      Parameters.Add(new ModuleParameter(51, 0.00079999997979, ModuleParameterDescription.sensitivityPress));
       Parameters.Add(new ModuleParameter(60, 1, ModuleParameterDescription.typePress));
       Parameters.Add(new ModuleParameter(70, 2232, ModuleParameterDescription.frequency));
     }

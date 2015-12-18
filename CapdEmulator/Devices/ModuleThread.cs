@@ -35,6 +35,7 @@ namespace CapdEmulator.Devices
     {
       shouldStop = false;
       thread = new Thread(DoWork);
+      thread.IsBackground = true;
       thread.Priority = ThreadPriority.Highest;
       this.moduleContext = moduleContext;
       this.signalGenerator = signalGenerator;

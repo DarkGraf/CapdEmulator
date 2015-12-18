@@ -14,3 +14,5 @@ CapdxxClient/obj
 CapdxxClient/CapdxxClient.csproj.user
 CapdxxTester/bin
 CapdxxTester/obj
+CapdxxTester/CapdxxTester.csproj.user
+bin

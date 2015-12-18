@@ -16,10 +16,7 @@ namespace CapdEmulator.ViewModels
       model = new MainModel();
       model.PropertyChanged += (s, e) => { NotifyPropertyChanged(e.PropertyName); };
 
-      ActiveCommand = new RelayCommand((obj) => 
-        {
-          model.Active = !model.Active;
-        });
+      ActiveCommand = new RelayCommand((obj) => { model.Active = !model.Active; });
     }
 
     public ICommand ActiveCommand { get; private set; }
@@ -27,6 +24,11 @@ namespace CapdEmulator.ViewModels
     public ObservableCollection<string> Messages 
     {
       get { return model.Messages; }
+    }
+
+    public bool Active
+    {
+      get { return model.Active; }
     }
 
     public double Press 

@@ -27,7 +27,9 @@ namespace CapdEmulator.Devices
     public const string digitCapacityAdc = "Разрядность АЦП";
     public const string levelIonAdc = "Уровень ИОН для АЦП";
     public const string channelPulse = "Коэффициент передачи канала пульса";
-    public const string channelPress = "Чувствительность датчика давления";
+    public const string channelVariablePress = "Коэффициент передачи переменного канала давления";
+    public const string channelConstantPress = "Коэффициент передачи постоянного канала давления";
+    public const string sensitivityPress = "Чувствительность датчика давления";
     public const string typePress = "Тип блока давления";
     public const string frequency = "Текущая частота дискретизации";
     public const string digitCapacityDac = "Разрядность ЦАП";

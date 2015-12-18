@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -36,6 +36,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -47,18 +50,44 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="..\CapdEmulator\Devices\Command.cs">
+      <Link>Links\Command.cs</Link>
+    </Compile>
+    <Compile Include="Devices\WorkThread.cs" />
+    <Compile Include="Views\Controls\Oscillograph.cs" />
+    <Compile Include="Views\PressView.xaml.cs">
+      <DependentUpon>PressView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PulseView.xaml.cs">
+      <DependentUpon>PulseView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Utils\ImageResource.cs" />
+    <Page Include="Views\DeviceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="..\CapdEmulator\WpfUtility\ChangeableObject.cs">
+      <Link>Links\ChangeableObject.cs</Link>
+    </Compile>
+    <Compile Include="..\CapdEmulator\WpfUtility\NotifyObject.cs">
+      <Link>Links\NotifyObject.cs</Link>
+    </Compile>
+    <Compile Include="..\CapdEmulator\WpfUtility\RelayCommand.cs">
+      <Link>Links\RelayCommand.cs</Link>
+    </Compile>
     <Compile Include="..\CapdxxClient\Types\DeviceInfo.cs">
-      <Link>Devices\DeviceInfo.cs</Link>
+      <Link>Links\DeviceInfo.cs</Link>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -66,12 +95,27 @@
     </Compile>
     <Compile Include="Devices\CapdxxApi.cs" />
     <Compile Include="Devices\Device.cs" />
+    <Compile Include="Devices\DevicesManager.cs" />
+    <Compile Include="Devices\Module.cs" />
     <Compile Include="Models\MainModel.cs" />
+    <Compile Include="ViewModels\DeviceViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\ModuleViewModel.cs" />
+    <Compile Include="Views\DeviceView.xaml.cs">
+      <DependentUpon>DeviceView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\PressView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PulseView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -100,7 +144,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Views\Images\Ecg.png" />
+    <Resource Include="Views\Images\Press.png" />
+    <Resource Include="Views\Images\Pulse.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

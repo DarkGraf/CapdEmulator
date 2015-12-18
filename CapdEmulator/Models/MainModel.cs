@@ -62,9 +62,9 @@ namespace CapdEmulator.Models
           serviceHost = CapdEmulatorService.CreateCapdEmulatorServiceHost(device);
           serviceHost.Open();
           controlEmulator = CapdControlEmulatorClient.CreateCapdControlEmulatorClient();
-          controlEmulator.CommandReceived += (s, e) => { Messages.Insert(0, e.Description); };
+          controlEmulator.CommandReceived += (s, e) => { AddMessage(e.Description); };
           controlEmulator.Connect();
-          Messages.Add("Активно");
+          AddMessage("Активно");
         }
         else if (serviceHost != null && !value)
         {
@@ -73,8 +73,9 @@ namespace CapdEmulator.Models
           controlEmulator = null;
           serviceHost.Close();
           serviceHost = null;
-          Messages.Add("Не активно");
+          AddMessage("Не активно");
         }
+        NotifyPropertyChanged();
       }
     }
 
@@ -84,6 +85,11 @@ namespace CapdEmulator.Models
     {
       get { return press; }
       private set { SetValue(ref press, value); }
+    }
+
+    private void AddMessage(string message)
+    {
+      Messages.Insert(0, message);
     }
   }
 }
