@@ -8,40 +8,19 @@ using CapdEmulator.WpfUtility;
 
 namespace CapdEmulator.Models
 {
-  class PressVisualContext : IPressVisualContext
-  {
-    #region IPressVisualContext
-    
-    public int Sistol
-    {
-      get { return 120; }
-    }
-
-    public int Diastol
-    {
-      get { return 80; }
-    }
-
-    public void NotifyPressChanged(double press)
-    {
-      if (PressChanged != null)
-        PressChanged(this, press);
-    }
-
-    public event EventHandler<double> PressChanged;
-
-    #endregion
-  }
-
   class MainModel : ChangeableObject
   {
+    IPressVisualContext pressVisualContext;
+    IPulseVisualContext pulseVisualContext;
+
     ServiceHost serviceHost;
     ICapdControlEmulatorClient controlEmulator;
 
-    double press;
-
-    public MainModel()
+    public MainModel(IPressVisualContext pressVisualContext, IPulseVisualContext pulseVisualContext)
     {
+      this.pressVisualContext = pressVisualContext;
+      this.pulseVisualContext = pulseVisualContext;
+
       Messages = new ObservableCollection<string>();
     }
 
@@ -52,10 +31,7 @@ namespace CapdEmulator.Models
       {
         if (serviceHost == null && value)
         {
-          IPressVisualContext pressVisualContext = new PressVisualContext();
-          pressVisualContext.PressChanged += (s, e) => { Press = e; };
-
-          ISignalGeneratorFactory signalGeneratorFactory = new SignalGeneratorFactory(pressVisualContext);
+          ISignalGeneratorFactory signalGeneratorFactory = new SignalGeneratorFactory(pressVisualContext, pulseVisualContext);
           IModuleFactory moduleFactory = new ModuleFactory(signalGeneratorFactory);
           IDevice device = new Device(moduleFactory);
 
@@ -80,12 +56,6 @@ namespace CapdEmulator.Models
     }
 
     public ObservableCollection<string> Messages { get; private set; }
-
-    public double Press
-    {
-      get { return press; }
-      private set { SetValue(ref press, value); }
-    }
 
     private void AddMessage(string message)
     {

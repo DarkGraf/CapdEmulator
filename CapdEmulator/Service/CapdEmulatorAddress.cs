@@ -27,7 +27,10 @@ namespace CapdEmulator.Service
 
     public static Binding GetBinding()
     {
-      return new NetNamedPipeBinding();
+      NetNamedPipeBinding binding = new NetNamedPipeBinding();
+      // Для ускорения отключим безопасность.
+      binding.Security.Mode = NetNamedPipeSecurityMode.None;
+      return binding;
     }
 
     public static EndpointAddress GetCapdEmulatorEndpointAddress()

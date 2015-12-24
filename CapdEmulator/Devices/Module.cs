@@ -67,17 +67,17 @@ namespace CapdEmulator.Devices
 
     public ModuleType ModuleType { get; private set; }
 
-    public byte ChannelCount { get; private set; }
+    public byte ChannelCount { get; protected set; }
 
-    public float GainFactor { get; private set; }
+    public float GainFactor { get; protected set; }
 
     public byte SplineLevel { get; private set; }
 
-    public abstract uint Version { get; protected set; }
+    public uint Version { get; protected set; }
 
-    public abstract uint Serial { get; protected set; }
+    public uint Serial { get; protected set; }
 
-    public abstract string Description { get; protected set; }
+    public string Description { get; protected set; }
 
     public IList<IModuleParameter> Parameters { get; protected set; }
 
@@ -101,6 +101,7 @@ namespace CapdEmulator.Devices
     {
       if (!active)
       {
+        signalGenerator.Prepare();
         thread = new ModuleThread(this, signalGenerator);
         thread.Start();
         active = true;
@@ -112,7 +113,6 @@ namespace CapdEmulator.Devices
       if (active)
       {
         thread.Stop();
-        signalGenerator = null;
         active = false;
       }
     }
@@ -150,12 +150,6 @@ namespace CapdEmulator.Devices
     }
 
     #region ModuleBase
-
-    public override uint Version { get; protected set; }
-
-    public override uint Serial { get; protected set; }
-
-    public override string Description { get; protected set; }
 
     protected override void InternalExecute(Command command, byte[] parameters)
     {
@@ -195,16 +189,6 @@ namespace CapdEmulator.Devices
       Parameters.Add(new ModuleParameter(70, 2232, ModuleParameterDescription.frequency));
     }
 
-    #region ModuleBase
-
-    public override uint Version { get; protected set; }
-
-    public override uint Serial { get; protected set; }
-
-    public override string Description { get; protected set; }
-
-    #endregion
-
     #region IModuleDacSupport
     
     public bool SetDACLevel(byte dacLevel)
@@ -224,6 +208,32 @@ namespace CapdEmulator.Devices
     #endregion
   }
 
+  class EcgModule : ModuleBase
+  {
+    public EcgModule(ConcurrentQueue<IQuantumDevice> quantumsQueue, ISignalGeneratorFactory signalGeneratorFactory)
+      : base(ModuleType.Ecg, quantumsQueue, signalGeneratorFactory)
+    {
+      Version = 0;
+      Serial = 1000003;
+      Description = "";
+      GainFactor = 0.53f;
+      ChannelCount = 9;
+
+      Parameters.Add(new ModuleParameter(1, 22, ModuleParameterDescription.digitCapacityAdc));
+      Parameters.Add(new ModuleParameter(2, 5, ModuleParameterDescription.levelIonAdc));
+      Parameters.Add(new ModuleParameter(11, 7.00250387191772, ModuleParameterDescription.channelR));
+      Parameters.Add(new ModuleParameter(12, 7, ModuleParameterDescription.channelL));
+      Parameters.Add(new ModuleParameter(13, 6.99418306350708, ModuleParameterDescription.channelF));
+      Parameters.Add(new ModuleParameter(14, 7.00289487838745, ModuleParameterDescription.channelC1));
+      Parameters.Add(new ModuleParameter(15, 7.01397466659546, ModuleParameterDescription.channelC2));
+      Parameters.Add(new ModuleParameter(16, 7.01498365402222, ModuleParameterDescription.channelC3));
+      Parameters.Add(new ModuleParameter(17, 7.00279903411865, ModuleParameterDescription.channelC4));
+      Parameters.Add(new ModuleParameter(18, 7.00690126419067, ModuleParameterDescription.channelC5));
+      Parameters.Add(new ModuleParameter(19, 7.01169919967651, ModuleParameterDescription.channelC6));
+      Parameters.Add(new ModuleParameter(70, 2232, ModuleParameterDescription.frequency));
+    }
+  }
+
   class NullModule : ModuleBase
   {
     class NullModuleThread : IModuleThread
@@ -239,16 +249,6 @@ namespace CapdEmulator.Devices
       Serial = 1;
       Description = "Нулевой модуль";
     }
-
-    #region ModuleBase
-
-    public override uint Version { get; protected set; }
-
-    public override uint Serial  { get; protected set; }
-
-    public override string Description { get; protected set; }
-
-    #endregion
   }
 
   /// <summary>
@@ -279,6 +279,9 @@ namespace CapdEmulator.Devices
           return true;
         case ModuleType.Pulse:
           module = new PulseModule(quantumsQueue, signalGeneratorFactory);
+          return true;
+        case ModuleType.Ecg:
+          module = new EcgModule(quantumsQueue, signalGeneratorFactory);
           return true;
       }
 

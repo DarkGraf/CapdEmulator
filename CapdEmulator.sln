@@ -11,6 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapdEmulator", "CapdEmulato
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapdxxTester", "CapdxxTester\CapdxxTester.csproj", "{0895B915-36EA-4C8F-AF1F-4B1B3E234ECC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeveloperUtilities", "DeveloperUtilities", "{8A1CA528-26D4-4121-93AC-7C4D60AEDD48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcgFourierDemo", "DeveloperUtilities\EcgFourierDemo\EcgFourierDemo.csproj", "{ECB120D7-9553-47F9-AF28-9FC1224DF53F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcgFourierDemoTest", "DeveloperUtilities\EcgFourierDemoTest\EcgFourierDemoTest.csproj", "{9B88F271-5A06-4515-9978-FF90EBA0A698}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,8 +39,20 @@ Global
 		{0895B915-36EA-4C8F-AF1F-4B1B3E234ECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0895B915-36EA-4C8F-AF1F-4B1B3E234ECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0895B915-36EA-4C8F-AF1F-4B1B3E234ECC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECB120D7-9553-47F9-AF28-9FC1224DF53F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECB120D7-9553-47F9-AF28-9FC1224DF53F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECB120D7-9553-47F9-AF28-9FC1224DF53F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECB120D7-9553-47F9-AF28-9FC1224DF53F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B88F271-5A06-4515-9978-FF90EBA0A698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B88F271-5A06-4515-9978-FF90EBA0A698}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B88F271-5A06-4515-9978-FF90EBA0A698}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B88F271-5A06-4515-9978-FF90EBA0A698}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ECB120D7-9553-47F9-AF28-9FC1224DF53F} = {8A1CA528-26D4-4121-93AC-7C4D60AEDD48}
+		{9B88F271-5A06-4515-9978-FF90EBA0A698} = {8A1CA528-26D4-4121-93AC-7C4D60AEDD48}
 	EndGlobalSection
 EndGlobal

@@ -35,5 +35,14 @@ namespace CapdEmulator.Devices
     public const string digitCapacityDac = "Разрядность ЦАП";
     public const string levelIonDac = "Уровень ИОН для ЦАП";
     public const string dacToAdc = "Коэффициент передачи от ЦАП до АЦП";
+    public const string channelR = "Коэффициент передачи R-канала";
+    public const string channelL = "Коэффициент передачи L-канала";
+    public const string channelF = "Коэффициент передачи F-канала";
+    public const string channelC1 = "Коэффициент передачи C1-канала";
+    public const string channelC2 = "Коэффициент передачи C2-канала";
+    public const string channelC3 = "Коэффициент передачи C3-канала";
+    public const string channelC4 = "Коэффициент передачи C4-канала";
+    public const string channelC5 = "Коэффициент передачи C5-канала";
+    public const string channelC6 = "Коэффициент передачи C6-канала";
   }
 }

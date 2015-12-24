@@ -14,6 +14,11 @@ namespace CapdxxClient
     /// </summary>
     static IntPtr ptrQuant = IntPtr.Zero;
 
+    /// <summary>
+    /// Буфер для метода GetQuant().
+    /// </summary>
+    static byte[] getQuant = new byte[259];
+
 #warning Если произошло исключение, то канал будет не рабочим в дальнейшем (например произвести поиск при выключенном сервисе).
     static ICapdEmulator proxyDevice = CapdEmulatorClient.CreateCapdEmulatorClient();
 
@@ -151,9 +156,15 @@ namespace CapdxxClient
       Quantum quantumWcf = proxyDevice.GetQuant(handle);
       if (quantumWcf.IsActual)
       {
-        QuantumDelphi quantumDelphi = new QuantumDelphi(quantumWcf.ModuleId, 
+        /*QuantumDelphi quantumDelphi = new QuantumDelphi(quantumWcf.ModuleId, 
           quantumWcf.ChannelId, quantumWcf.DataType, quantumWcf.Data);
-        Marshal.StructureToPtr(quantumDelphi, ptrQuant, false);
+        Marshal.StructureToPtr(quantumDelphi, ptrQuant, false);*/
+
+        getQuant[0] = quantumWcf.ModuleId;
+        getQuant[1] = quantumWcf.ChannelId;
+        getQuant[2] = quantumWcf.DataType;
+        Array.Copy(quantumWcf.Data, 0, getQuant, 3, quantumWcf.Data.Length);
+        Marshal.Copy(getQuant, 0, ptrQuant, 259);
         quant = ptrQuant;
       }
 

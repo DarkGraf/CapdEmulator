@@ -15,4 +15,8 @@ CapdxxClient/CapdxxClient.csproj.user
 CapdxxTester/bin
 CapdxxTester/obj
 CapdxxTester/CapdxxTester.csproj.user
+DeveloperUtilities/EcgFourierDemo/bin
+DeveloperUtilities/EcgFourierDemo/obj
+DeveloperUtilities/EcgFourierDemoTest/bin
+DeveloperUtilities/EcgFourierDemoTest/obj
 bin

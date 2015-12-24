@@ -62,6 +62,9 @@
     </Compile>
     <Compile Include="Devices\WorkThread.cs" />
     <Compile Include="Views\Controls\Oscillograph.cs" />
+    <Compile Include="Views\EcgView.xaml.cs">
+      <DependentUpon>EcgView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PressView.xaml.cs">
       <DependentUpon>PressView.xaml</DependentUpon>
     </Compile>
@@ -70,6 +73,10 @@
     </Compile>
     <Compile Include="Views\Utils\ImageResource.cs" />
     <Page Include="Views\DeviceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EcgView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

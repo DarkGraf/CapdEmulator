@@ -13,17 +13,19 @@ namespace CapdxxTester.Views.Controls
 {
   interface IOscillographContext
   {
-    void AddNewValue(double newValue);
+    void AddNewValue(double newValue, byte channel);
   }
 
   interface IOscillographContextSetter
   {
-    IOscillographContext OscillographContext { get; set; }
+    IOscillographContext OscillographContext { set; }
   }
 
   class Oscillograph : WindowsFormsHost, IOscillographContext
   {
     const int CapacityDefault = 1000;
+    const byte ChannelDefault = 0;
+    const byte VisualizationOfEachPointFromDefault = 1;
     
     #region Зависимое свойство Capacity.
 
@@ -79,6 +81,61 @@ namespace CapdxxTester.Views.Controls
 
     #endregion
 
+    #region Зависимое свойство Channel.
+
+    public static readonly DependencyProperty ChannelProperty =
+      DependencyProperty.Register("Channel",
+      typeof(byte),
+      typeof(Oscillograph), new FrameworkPropertyMetadata(ChannelDefault, ChannelPropertyChangedCallback));
+
+    private static void ChannelPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+      Oscillograph obj = d as Oscillograph;
+      if (obj != null && e.NewValue is byte)
+      {
+        obj.ChannelPropertyChanged((byte)e.NewValue);
+      }
+    }
+
+    /// <summary>
+    /// Номер канала для вывода.
+    /// </summary>
+    public byte Channel
+    {
+      get { return (byte)GetValue(ChannelProperty); }
+      set { SetValue(ChannelProperty, value); }
+    }
+
+    #endregion    
+
+    #region Зависимое свойство VisualizationOfEachPointFrom.
+
+    public static readonly DependencyProperty VisualizationOfEachPointFromProperty =
+      DependencyProperty.Register("VisualizationOfEachPointFrom",
+      typeof(byte),
+      typeof(Oscillograph), new FrameworkPropertyMetadata(VisualizationOfEachPointFromDefault, VisualizationOfEachPointFromPropertyChangedCallback));
+
+    private static void VisualizationOfEachPointFromPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+      Oscillograph obj = d as Oscillograph;
+      if (obj != null && e.NewValue is byte)
+      {
+        obj.VisualizationOfEachPointFromPropertyChanged((byte)e.NewValue);
+      }
+    }
+
+    /// <summary>
+    /// Визуализация каждой точки из указанного числа. Остальные точки будут пропущены.
+    /// Применяется для ускорения отрисовки графика.
+    /// </summary>
+    public byte VisualizationOfEachPointFrom
+    {
+      get { return (byte)GetValue(VisualizationOfEachPointFromProperty); }
+      set { SetValue(VisualizationOfEachPointFromProperty, value); }
+    }
+
+    #endregion
+
     SynchronizationContext synchronizationContext;
 
     Chart chart;
@@ -86,11 +143,31 @@ namespace CapdxxTester.Views.Controls
     Series series;
     Series cursorSeries;
 
-    volatile int cursor = 0;
+    /// <summary>
+    /// Текущая точка для отображения.
+    /// </summary>
+    volatile int cursor;
+    /// <summary>
+    /// Номер канала для визуализации. Дублирует значение свойства Channel.
+    /// </summary>
+    volatile byte internalChannel;
+    /// <summary>
+    /// Отрисовка только указанной точки. Дублирует значение свойства VisualizationOfEachPointFrom.
+    /// </summary>
+    volatile byte internalVisualizationOfEachPointFrom;
+    /// <summary>
+    /// Счетчик для отображения точек указанных в VisualizationOfEachPointFrom.
+    /// </summary>
+    volatile int pointsCounter;
 
     public Oscillograph()
     {
       InitializeChart();
+
+      cursor = 0;
+      internalChannel = ChannelDefault;
+      internalVisualizationOfEachPointFrom = VisualizationOfEachPointFromDefault;
+      pointsCounter = 0;
     }
 
     private void InitializeChart()
@@ -147,22 +224,40 @@ namespace CapdxxTester.Views.Controls
         setter.OscillographContext = this;
     }
 
-    #region IOscillographContext
-    
-    public void AddNewValue(double newValue)
+    private void ChannelPropertyChanged(byte channel)
     {
-      synchronizationContext.Post(delegate
+      // Запомним в volatile переменной номер канала,
+      // читать будем в AddNewValue в другом потоке, не в UI.
+      internalChannel = channel;
+    }
+
+    private void VisualizationOfEachPointFromPropertyChanged(byte visualizationOfEachPointFrom)
+    {
+      internalVisualizationOfEachPointFrom = visualizationOfEachPointFrom;
+    }
+
+    #region IOscillographContext
+
+    public void AddNewValue(double newValue, byte channel)
+    {
+      if (internalChannel == channel)
       {
-        series.Points[cursor] = new DataPoint(cursor, newValue);
+        if (pointsCounter++ % internalVisualizationOfEachPointFrom == 0)
+        {
+          synchronizationContext.Post(delegate
+          {
+            series.Points[cursor] = new DataPoint(cursor, newValue);
 
-        if (newValue < chartArea.AxisY.Minimum || newValue > chartArea.AxisY.Maximum)
-          chartArea.RecalculateAxesScale();
-        cursorSeries.Points[0] = new DataPoint(cursor, chartArea.AxisY.Minimum * 0.99);
-        cursorSeries.Points[1] = new DataPoint(cursor, chartArea.AxisY.Maximum * 0.99);
+            if (newValue < chartArea.AxisY.Minimum || newValue > chartArea.AxisY.Maximum)
+              chartArea.RecalculateAxesScale();
+            cursorSeries.Points[0] = new DataPoint(cursor, chartArea.AxisY.Minimum * 0.99);
+            cursorSeries.Points[1] = new DataPoint(cursor, chartArea.AxisY.Maximum * 0.99);
 
-        cursor++;
-        cursor %= Capacity;
-      }, null);
+            cursor++;
+            cursor %= Capacity;
+          }, null);
+        }
+      }      
     }
 
     #endregion

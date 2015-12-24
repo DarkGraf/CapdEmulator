@@ -45,8 +45,10 @@ namespace CapdxxTester.Models
     /// Событие, аргумент которого содержит очередное значение новой точки сигнала.
     /// Вызывается в рабочем потоке.
     /// </summary>
-    event EventHandler<double> NewValueReceived;
+    event EventHandler<double, byte> NewValueReceived;
   }
+
+  delegate void EventHandler<TEventArgs1, TEventArgs2>(object sender, TEventArgs1 e1, TEventArgs2 e2);
 
   interface IPressModule : IModule
   {

@@ -4,7 +4,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:viewmodels="clr-namespace:CapdxxTester.ViewModels"
   xmlns:views="clr-namespace:CapdxxTester.Views"
-  Title="MainWindow" Width="1000" Height="600">
+  Title="CapdxxTester" Width="1000" Height="600">
 
   <Window.DataContext>
     <viewmodels:MainViewModel />
@@ -19,6 +19,9 @@
     </DataTemplate>
     <DataTemplate DataType="{x:Type viewmodels:PulseModuleViewModel}">
       <views:PulseView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type viewmodels:EcgModuleViewModel}">
+      <views:EcgView />
     </DataTemplate>
   </Window.Resources>
 

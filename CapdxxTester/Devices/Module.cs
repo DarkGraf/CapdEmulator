@@ -95,13 +95,13 @@ namespace CapdxxTester.Devices
 
     public void AddQuant(IQuant quant)
     {
-      if (quant.ChannelId == 0 && active)
+      if (active)
       {
         queue.Enqueue(quant);
       }
     }
 
-    public event EventHandler<double> NewValueReceived;
+    public event EventHandler<double, byte> NewValueReceived;
 
     #endregion
 
@@ -119,7 +119,7 @@ namespace CapdxxTester.Devices
           if (queue.TryDequeue(out quant) && quant.DataType == 2)
           {
             if (NewValueReceived != null)
-              NewValueReceived(this, BitConverter.ToInt32(quant.Data, 0));
+              NewValueReceived(this, BitConverter.ToInt32(quant.Data, 0), quant.ChannelId);
           }
         }
 
@@ -205,9 +205,9 @@ namespace CapdxxTester.Devices
 
     protected override void InternalStop()
     {
-      DeviceContext.Stop(4);
+      DeviceContext.Stop(Id);
       //Выключить диод
-      DeviceContext.SendCommand(4, (byte)Command.opPulsOff0);
+      DeviceContext.SendCommand(Id, (byte)Command.opPulsOff0);
     }
 
     #endregion
@@ -223,12 +223,13 @@ namespace CapdxxTester.Devices
 
     protected override void InternalStart()
     {
-
+      DeviceContext.SetADCFrequency(Id, 1116);
+      DeviceContext.Start(Id);
     }
 
     protected override void InternalStop()
     {
-
+      DeviceContext.Stop(Id);
     }
 
     #endregion

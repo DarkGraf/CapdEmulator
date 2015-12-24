@@ -14,10 +14,14 @@ namespace CapdEmulator.Devices
   {
     int Frequency { get; }
     /// <summary>
-    /// Получает сигнал в момент времени timePoint.
+    /// Подготовка генератора к работе.
+    /// </summary>
+    void Prepare();
+    /// <summary>
+    /// Получает сигналы по количеству каналов в момент времени timePoint.
     /// В одной секунде содержится Frequency моментов времени.
     /// </summary>
-    int Calculate(int timePoint);
+    int[] Calculate(int timePoint);
     /// <summary>
     /// Выполнение команды.
     /// </summary>
@@ -54,9 +58,12 @@ namespace CapdEmulator.Devices
 
       while (!shouldStop)
       {
-        int signal = signalGenerator.Calculate(timePoint++);
-        IQuantumDevice quantum = new QuantumDevice(moduleContext.ModuleType, 0, DataType.Data, BitConverter.GetBytes(signal));
-        moduleContext.QuantumsQueue.Enqueue(quantum);
+        int[] signals = signalGenerator.Calculate(timePoint++);
+        for (byte i = 0; i < signals.Length; i++)
+        {
+          IQuantumDevice quantum = new QuantumDevice(moduleContext.ModuleType, i, DataType.Data, BitConverter.GetBytes(signals[i]));
+          moduleContext.QuantumsQueue.Enqueue(quantum);
+        }
 
         curTicks += tickPeriod;
         while (curTicks > DateTime.Now.Ticks)

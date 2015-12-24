@@ -13,15 +13,22 @@ namespace CapdxxTester.ViewModels
   abstract class ModuleViewModel : ChangeableObject, IOscillographContextSetter
   {
     private IModule module;
+    IOscillographContext[] oscillographContexts;
 
     public ModuleViewModel(IModule module)
     {
       this.module = module;
       module.PropertyChanged += (s, e) => { NotifyPropertyChanged(e.PropertyName); };
-      module.NewValueReceived += (s, e) => { OscillographContext.AddNewValue(e); };
+      module.NewValueReceived += (s, value, channel) => 
+      { 
+        foreach (IOscillographContext context in oscillographContexts)
+          context.AddNewValue(value, channel); 
+      };
 
       StartCommand = new RelayCommand(obj => Start(obj));
       StopCommand = new RelayCommand(obj => Stop(obj));
+
+      oscillographContexts = new IOscillographContext[0];
     }
 
     public ICommand StartCommand { get; private set; }
@@ -47,7 +54,15 @@ namespace CapdxxTester.ViewModels
 
     #region IOscillographContextSetter
 
-    public IOscillographContext OscillographContext { get; set; }
+    public IOscillographContext OscillographContext 
+    { 
+      set
+      {
+        int index = oscillographContexts.Length;
+        Array.Resize(ref oscillographContexts, index + 1);
+        oscillographContexts[index] = value;
+      }
+    }
 
     #endregion
   }
