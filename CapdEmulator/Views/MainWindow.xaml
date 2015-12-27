@@ -109,7 +109,6 @@
     <Grid.RowDefinitions>
       <RowDefinition Height="2*" />
       <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
       <RowDefinition Height="1*" />
     </Grid.RowDefinitions>
     
@@ -141,18 +140,23 @@
         <Label Canvas.Top="28" Canvas.Left="33" Content="осмотра КАПД-02-СТ" Foreground="#FF6C737B" FontSize="3" />
         
         <!-- Лампочка питания. -->
-        <Ellipse Canvas.Left="240" Canvas.Top="29" Width="6" Height="6" Stroke="#FF888888" StrokeThickness="0.5">
+        <Ellipse Canvas.Left="240" Canvas.Top="29" Width="6" Height="6" Stroke="#FF888888" StrokeThickness="0.3">
           <Ellipse.Style>
             <Style TargetType="Ellipse">
               <Setter Property="Fill" Value="LightGray" />
               <Style.Triggers>
                 <DataTrigger Binding="{Binding Active}" Value="True">
-                  <Setter Property="Fill" Value="Lime" />
+                  <Setter Property="Fill" Value="#52D468" />
                 </DataTrigger>
               </Style.Triggers>
             </Style>
           </Ellipse.Style>
         </Ellipse>
+
+        <ToggleButton 
+          Canvas.Left="230" Canvas.Top="57" Width="26"
+          Style="{StaticResource AnimatedSwitch}"
+          Command="{Binding ActiveCommand}" />
       </Canvas>
     </Viewbox>
     
@@ -165,7 +169,6 @@
       </ItemsControl.ItemsPanel>
     </ItemsControl>
     
-    <Button Grid.Row="2" Content="Вкл./Выкл." Command="{Binding ActiveCommand}" />
-    <ListBox Grid.Row="3" ItemsSource="{Binding Messages}" />
+    <ListBox Grid.Row="2" ItemsSource="{Binding Messages}" />
   </Grid>
 </Window>
