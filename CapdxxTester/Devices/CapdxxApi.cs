@@ -30,10 +30,10 @@ namespace CapdxxTester.Devices
       IntPtr ptr = IntPtr.Zero;
       int size = 0;
 
-      if (SearchDevices(ptr, ref size))
+      if (SearchDevices(ptr, ref size) && size > 0)
       {
         ptr = Marshal.AllocHGlobal(size);
-        if (SearchDevices(ptr, ref size) && size > 0)
+        if (SearchDevices(ptr, ref size))
         {
           int sizeInfo = Marshal.SizeOf(typeof(DeviceInfoDelphi));
           for (int i = 0; i < size / sizeInfo; i++)
@@ -144,10 +144,10 @@ namespace CapdxxTester.Devices
       IntPtr ptr = IntPtr.Zero;
       int size = 0;
 
-      if (SearchModules((uint)handle, ptr, ref size))
+      if (SearchModules((uint)handle, ptr, ref size) && size > 0)
       {
         ptr = Marshal.AllocHGlobal(size);
-        if (SearchModules((uint)handle, ptr, ref size) && size > 0)
+        if (SearchModules((uint)handle, ptr, ref size))
         {
           int sizeInfo = Marshal.SizeOf(typeof(ModuleInfoDelphi));
           for (int i = 0; i < size / sizeInfo; i++)

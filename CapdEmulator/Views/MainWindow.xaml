@@ -63,10 +63,10 @@
               Grid.Column="0" Grid.Row="2" 
               Text="Текущее давление:"
               Style="{StaticResource infoText}" />
-            <TextBlock 
-              Grid.Column="1" Grid.Row="2"
+            <TextBox 
+              Grid.Column="1" Grid.Row="2" IsReadOnly="True"
               Text="{Binding Press, Mode=OneWay}"
-              Style="{StaticResource infoText}" />
+              Style="{StaticResource infoBox}" />
           </Grid>
         </StackPanel>
       </Border>
@@ -161,7 +161,7 @@
     </Viewbox>
     
     <!-- Управление блоком. -->
-    <ItemsControl Grid.Row="1" ItemsSource="{Binding Modules}">
+    <ItemsControl Grid.Row="1" ItemsSource="{Binding Modules}" MaxWidth="600">
       <ItemsControl.ItemsPanel>
         <ItemsPanelTemplate>
           <UniformGrid Columns="3" Margin="5" />

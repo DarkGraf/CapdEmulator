@@ -9,6 +9,7 @@ namespace CapdxxTester.ViewModels
 {
   class MainViewModel : ChangeableObject
   {
+    bool active;
     MainModel model;
     DeviceViewModel deviceViewModel;
 
@@ -19,6 +20,7 @@ namespace CapdxxTester.ViewModels
       model.PropertyChanged += (s, e) => { NotifyPropertyChanged(e.PropertyName); };
 
       SearchCommand = new RelayCommand(obj => Search(obj));
+      active = false;
     }
 
     public ICommand SearchCommand { get; private set; }
@@ -33,11 +35,14 @@ namespace CapdxxTester.ViewModels
 
     private void Search(object obj)
     {
-      if (model.Device == null)
+      if (active = !active)
       {
         model.Search();
-        DeviceViewModel = new DeviceViewModel(model.Device);
-        DeviceViewModel.Open();
+        if (model.Device != null)
+        {
+          DeviceViewModel = new DeviceViewModel(model.Device);
+          DeviceViewModel.Open();
+        }
       }
       else
       {

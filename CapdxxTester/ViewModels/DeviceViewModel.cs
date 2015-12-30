@@ -23,14 +23,14 @@ namespace CapdxxTester.ViewModels
         if (e.Action == NotifyCollectionChangedAction.Add)
         {
           foreach (IModule module in e.NewItems.OfType<IModule>())
-	        {
+          {
             if (module.ModuleType == 3 && module is IPressModule)
               ModuleViewModels.Add(new PressModuleViewModel(module as IPressModule));
             if (module.ModuleType == 4)
               ModuleViewModels.Add(new PulseModuleViewModel(module));
             if (module.ModuleType == 5)
               ModuleViewModels.Add(new EcgModuleViewModel(module));
-        	}
+          }
         }
       };
     }

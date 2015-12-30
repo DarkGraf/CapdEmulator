@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 using CapdxxClient.Types;
@@ -9,6 +8,34 @@ namespace CapdxxClient
 {
   public static class Export
   {
+    private static bool Run(Func<bool> method)
+    {
+      try
+      {
+        return method();
+      }
+      catch
+      {
+        // Если произошло исключение, сбросим прокси.
+        proxyDevice = null;
+      }
+      return true;
+    }
+
+    private static bool Run(Action method)
+    {
+      try
+      {
+        method();
+      }
+      catch
+      {
+        // Если произошло исключение, сбросим прокси.
+        proxyDevice = null;
+      }
+      return true;
+    }
+
     /// <summary>
     /// Квант данных для метода GetQuant. Объявлен статическим в целях оптимизации.
     /// </summary>
@@ -19,90 +46,116 @@ namespace CapdxxClient
     /// </summary>
     static byte[] getQuant = new byte[259];
 
-#warning Если произошло исключение, то канал будет не рабочим в дальнейшем (например произвести поиск при выключенном сервисе).
-    static ICapdEmulator proxyDevice = CapdEmulatorClient.CreateCapdEmulatorClient();
+    static ICapdEmulator proxyDevice = null;
+    static ICapdEmulator ProxyDevice
+    {
+      get 
+      {
+        if (proxyDevice == null)
+          proxyDevice = CapdEmulatorClient.CreateCapdEmulatorClient();
+        return proxyDevice;
+      }
+    }      
 
     public static bool SearchDevices(IntPtr deviceInfo, ref int size)
     {
-      DeviceInfo[] devices = proxyDevice.SearchDevices();
-      size = devices.Length * Marshal.SizeOf(typeof(DeviceInfoDelphi));
-      if (deviceInfo != IntPtr.Zero)
+      int s = 0;
+      bool result = Run(delegate
       {
-        foreach (var device in devices)
+        DeviceInfo[] devices = ProxyDevice.SearchDevices();
+        s = devices.Length * Marshal.SizeOf(typeof(DeviceInfoDelphi));
+        if (deviceInfo != IntPtr.Zero)
         {
-          DeviceInfoDelphi info = new DeviceInfoDelphi
+          foreach (var device in devices)
           {
-            Handle = device.Handle,
-            DeviceVersion = device.Version,
-            DescriptionLength = (byte)device.Description.Length,
-            // Необходимо добавить в конце нулевый символы, иначе будет исключение.
-            Description = device.Description.ToBytesArray(32)
-          };
-          Marshal.StructureToPtr(info, deviceInfo, false);
-          deviceInfo += Marshal.SizeOf(info);
+            DeviceInfoDelphi info = new DeviceInfoDelphi
+            {
+              Handle = device.Handle,
+              DeviceVersion = device.Version,
+              DescriptionLength = (byte)device.Description.Length,
+              // Необходимо добавить в конце нулевый символы, иначе будет исключение.
+              Description = device.Description.ToBytesArray(32)
+            };
+            Marshal.StructureToPtr(info, deviceInfo, false);
+            deviceInfo += Marshal.SizeOf(info);
+          }
         }
-      }
-      return true;
+      });
+      size = s;
+      return result;
     }
 
     public static bool SearchModules(uint handle, IntPtr modulesInfo, ref int size)
     {
-      ModuleInfo[] modules = proxyDevice.SearchModules(handle);
-      size = modules.Length * Marshal.SizeOf(typeof(ModuleInfoDelphi));
-      if (modulesInfo != IntPtr.Zero)
+      int s = 0;
+      bool result = Run(delegate
       {
-        foreach (var module in modules)
+        ModuleInfo[] modules = ProxyDevice.SearchModules(handle);
+        s = modules.Length * Marshal.SizeOf(typeof(ModuleInfoDelphi));
+        if (modulesInfo != IntPtr.Zero)
         {
-          ModuleInfoDelphi info = new ModuleInfoDelphi
+          foreach (var module in modules)
           {
-            Id = module.Id,
-            ModuleType = module.ModuleType,
-            Channels = module.ChannelCount,
-            GainFactor = module.GainFactor,
-            SplineLevel = module.SplineLevel,
-            Version = module.Version,
-            Serial = module.Serial,
-            DescriptionLength = (byte)module.Description.Length,
-            Description = module.Description.ToBytesArray(32)
-          };
+            ModuleInfoDelphi info = new ModuleInfoDelphi
+            {
+              Id = module.Id,
+              ModuleType = module.ModuleType,
+              Channels = module.ChannelCount,
+              GainFactor = module.GainFactor,
+              SplineLevel = module.SplineLevel,
+              Version = module.Version,
+              Serial = module.Serial,
+              DescriptionLength = (byte)module.Description.Length,
+              Description = module.Description.ToBytesArray(32)
+            };
 
-          Marshal.StructureToPtr(info, modulesInfo, false);
-          modulesInfo += Marshal.SizeOf(info);
+            Marshal.StructureToPtr(info, modulesInfo, false);
+            modulesInfo += Marshal.SizeOf(info);
+          }
         }
-      }
-      return true;
+      });
+      size = s;
+      return result;
     }
 
     public static bool OpenDevice(uint handle)
     {
-      ptrQuant = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(QuantumDelphi)));
-      proxyDevice.OpenDevice(handle);
-      return true;
+      return Run(delegate
+      {
+        ptrQuant = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(QuantumDelphi)));
+        ProxyDevice.OpenDevice(handle);
+      });
     }
 
     public static bool CloseDevice(uint handle)
     {
-      proxyDevice.CloseDevice(handle);
-      if (ptrQuant != IntPtr.Zero)
+      return Run(delegate
       {
-        Marshal.FreeHGlobal(ptrQuant);
-        ptrQuant = IntPtr.Zero;
-      }
-      return true;
+        ProxyDevice.CloseDevice(handle);
+        if (ptrQuant != IntPtr.Zero)
+        {
+          Marshal.FreeHGlobal(ptrQuant);
+          ptrQuant = IntPtr.Zero;
+        }
+      });
     }
 
     public static bool SendCommandSync(uint handle, byte address, byte command, IntPtr param, int maxIndex)
     {
-      DelphiOpenArray<byte> bytes = new DelphiOpenArray<byte>(param, maxIndex);
-      proxyDevice.SendCommandSync(handle, address, command, bytes.Array);
-      return true;
+      return Run(delegate
+      {
+        DelphiOpenArray<byte> bytes = new DelphiOpenArray<byte>(param, maxIndex);
+        ProxyDevice.SendCommandSync(handle, address, command, bytes.Array);
+      });
     }
 
     public static bool SendCommandAsync(uint handle, byte address, byte command, IntPtr param, int maxIndex)
     {
-      DelphiOpenArray<byte> bytes = new DelphiOpenArray<byte>(param, maxIndex);
-      proxyDevice.SendCommandSync(handle, address, command, bytes.Array);
-      return true;
+      return Run(delegate
+      {
+        DelphiOpenArray<byte> bytes = new DelphiOpenArray<byte>(param, maxIndex);
+        ProxyDevice.SendCommandSync(handle, address, command, bytes.Array);
+      });
     }
 
     public static bool Burn(uint handle, int controller, IntPtr firmware)
@@ -112,30 +165,42 @@ namespace CapdxxClient
 
     public static bool StartModule(uint handle, byte address)
     {
-      proxyDevice.StartModule(handle, address);
-      return true;
+      return Run(delegate
+      {
+        ProxyDevice.StartModule(handle, address);
+      });
     }
 
     public static bool StopModule(uint handle, byte address)
     {
-      proxyDevice.StopModule(handle, address);
-      return true;
+      return Run(delegate
+      {
+        ProxyDevice.StopModule(handle, address);
+      });
     }
 
     public static bool SetADCFreq(uint handle, int address, int adcFreq)
     {
-      proxyDevice.SetADCFreq(handle, (byte)address, adcFreq);
-      return true;
+      return Run(delegate
+      {
+        ProxyDevice.SetADCFreq(handle, (byte)address, adcFreq);
+      });
     }
 
     public static bool SetDACLevel(uint handle, byte address, byte dacLevel)
     {
-      return proxyDevice.SetDACLevel(handle, address, dacLevel);
+      return Run(delegate
+      {
+        return ProxyDevice.SetDACLevel(handle, address, dacLevel);
+      });
     }
 
     public static bool SetZeroDAC(uint handle, byte address)
     {
-      return proxyDevice.SetZeroDAC(handle, address);
+      return Run(delegate
+      {
+        return ProxyDevice.SetZeroDAC(handle, address);
+      });
     }
 
     public static void LogMessage(IntPtr text, bool newFile)
@@ -150,48 +215,59 @@ namespace CapdxxClient
 
     public static bool GetQuant(uint handle, ref IntPtr quant)
     {
-      if (ptrQuant == IntPtr.Zero)
-        return false;
-
-      Quantum quantumWcf = proxyDevice.GetQuant(handle);
-      if (quantumWcf.IsActual)
+      IntPtr ptr = IntPtr.Zero;
+      bool result = Run(delegate
       {
-        /*QuantumDelphi quantumDelphi = new QuantumDelphi(quantumWcf.ModuleId, 
-          quantumWcf.ChannelId, quantumWcf.DataType, quantumWcf.Data);
-        Marshal.StructureToPtr(quantumDelphi, ptrQuant, false);*/
+        if (ptrQuant == IntPtr.Zero)
+          return false;
 
-        getQuant[0] = quantumWcf.ModuleId;
-        getQuant[1] = quantumWcf.ChannelId;
-        getQuant[2] = quantumWcf.DataType;
-        Array.Copy(quantumWcf.Data, 0, getQuant, 3, quantumWcf.Data.Length);
-        Marshal.Copy(getQuant, 0, ptrQuant, 259);
-        quant = ptrQuant;
-      }
+        Quantum quantumWcf = ProxyDevice.GetQuant(handle);
+        if (quantumWcf.IsActual)
+        {
+          /*QuantumDelphi quantumDelphi = new QuantumDelphi(quantumWcf.ModuleId, 
+            quantumWcf.ChannelId, quantumWcf.DataType, quantumWcf.Data);
+          Marshal.StructureToPtr(quantumDelphi, ptrQuant, false);*/
 
-      return quantumWcf.IsActual;
+          getQuant[0] = quantumWcf.ModuleId;
+          getQuant[1] = quantumWcf.ChannelId;
+          getQuant[2] = quantumWcf.DataType;
+          Array.Copy(quantumWcf.Data, 0, getQuant, 3, quantumWcf.Data.Length);
+          Marshal.Copy(getQuant, 0, ptrQuant, 259);
+          ptr = ptrQuant;
+        }
+
+        return quantumWcf.IsActual;
+      });
+      quant = ptr;
+      return result;
     }
 
     public static bool GetModuleParams(uint handle, byte address, IntPtr buffer, ref int size)
     {
-      ModuleParamInfo[] parameters = proxyDevice.GetModuleParams(handle, address);
-      size = parameters.Length;
-      if (buffer != IntPtr.Zero)
+      int s = 0;
+      bool result = Run(delegate
       {
-        foreach (var parameter in parameters)
+        ModuleParamInfo[] parameters = ProxyDevice.GetModuleParams(handle, address);
+        s = parameters.Length;
+        if (buffer != IntPtr.Zero)
         {
-          ModuleParamInfoDelphi info = new ModuleParamInfoDelphi
+          foreach (var parameter in parameters)
           {
-            Id = parameter.Id,
-            Value = parameter.Value,
-            DescriptionLength = (byte)parameter.Description.Length,
-            Description = parameter.Description.ToBytesArray(255)
-          };
+            ModuleParamInfoDelphi info = new ModuleParamInfoDelphi
+            {
+              Id = parameter.Id,
+              Value = parameter.Value,
+              DescriptionLength = (byte)parameter.Description.Length,
+              Description = parameter.Description.ToBytesArray(255)
+            };
 
-          Marshal.StructureToPtr(info, buffer, false);
-          buffer += Marshal.SizeOf(info);
+            Marshal.StructureToPtr(info, buffer, false);
+            buffer += Marshal.SizeOf(info);
+          }
         }
-      }
-      return true;
+      });
+      size = s;
+      return result;
     }
   }
 }
